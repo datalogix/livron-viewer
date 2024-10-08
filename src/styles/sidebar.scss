@@ -1,0 +1,77 @@
+.thumbnail-sidebar {
+  @apply w-full h-full flex-1 overflow-auto flex flex-col items-center bg-gray-200 overflow-y-scroll absolute;
+}
+
+.thumbnail {
+  margin: 6px;
+  width: var(--thumbnail-width);
+  height: var(--thumbnail-height);
+  border: 7px solid transparent;
+  border-radius: 2px;
+}
+
+.sidebar-drawer .drawer-container  {
+  @apply top-10!;
+
+  height: calc(100vh - 2.5rem) !important;
+}
+
+.sidebar {
+  @apply
+    flex
+    flex-col
+    w-full
+    h-full
+  ;
+
+  .sidebar-menu {
+    @apply
+      flex
+      divide-x
+      border-b
+      bg-gray-50
+      shadow
+    ;
+
+    .sidebar-item {
+      @apply
+        w-10
+        h-10
+        flex
+        text-gray-700
+        items-center
+        justify-center
+        overflow-hidden
+        transition
+        hover:bg-gray-100
+        hover:text-gray-900
+      ;
+
+      &.selected {
+        @apply
+          bg-gray-100
+          text-gray-900
+          shadow-inner
+        ;
+      }
+
+      &:before {
+        content: '';
+
+        @apply
+          i-ph:question-mark
+          text-lg
+        ;
+      }
+    }
+  }
+
+  .sidebar-content {
+    @apply
+      flex-1
+      overflow-auto
+      transition
+      relative
+    ;
+  }
+}

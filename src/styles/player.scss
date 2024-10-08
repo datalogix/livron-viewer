@@ -1,0 +1,34 @@
+.player {
+  @apply
+    w-full
+    max-w-72!
+    md:max-w-sm!
+  ;
+
+  &:has(video) {
+    @apply
+      md:max-w-lg!
+      lg:max-w-xl!
+    ;
+  }
+
+  .modal-content {
+    @apply
+      p-2!
+    ;
+  }
+
+  audio {
+    @apply
+      w-full
+    ;
+  }
+
+   video {
+    @apply
+      rounded
+      w-full
+      h-full
+    ;
+  }
+}

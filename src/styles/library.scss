@@ -1,0 +1,41 @@
+.library {
+  @apply max-w-2xl;
+
+  .modal-content {
+    @apply overflow-auto max-h-140;
+
+    .books {
+      @apply flex flex-col gap-6;
+    }
+
+    .book {
+      @apply flex cursor-pointer items-center shadow border border-gray-100 rounded hover:scale-105 transition overflow-hidden p-6 gap-6;
+
+      > i {
+        @apply i-ph:book w-32 h-40 text-gray-500 shrink-0;
+      }
+
+      > img {
+        @apply w-32 h-40 shrink-0;
+      }
+
+      .info {
+        @apply flex-1 flex flex-col gap-4;
+
+        h2 {
+          @apply text-lg font-semibold text-gray-700;
+        }
+
+        ul {
+          li {
+            @apply text-sm mb-1;
+
+            b {
+              @apply font-medium;
+            }
+          }
+        }
+      }
+    }
+  }
+}

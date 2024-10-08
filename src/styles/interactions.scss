@@ -1,0 +1,268 @@
+.bookmarkLayer {
+  transform-origin: 0 0;
+  pointer-events: none;
+
+  @apply
+    absolute
+    inset-0
+  ;
+
+  .bookmark {
+    pointer-events: auto;
+    width: calc(1.5rem * var(--scale-factor));
+    height: calc(1.5rem * var(--scale-factor));
+
+    @apply
+      top-10
+      right-0
+      translate-x-[80%]
+      absolute
+      transition
+      hover:translate-x-[95%]
+      hover:scale-110
+      flex items-center justify-center
+      text-gray-500
+      rotate-90
+      z-0
+    ;
+
+    &:before {
+      content: '';
+
+      @apply i-ph:bookmark w-full h-full;
+    }
+
+    &.selected {
+      @apply
+        text-red
+        scale-110
+        translate-x-[95%]
+      ;
+    }
+  }
+}
+
+.interactionLayer {
+  transform-origin: 0 0;
+  pointer-events: none;
+
+  @apply
+    absolute
+    inset-0
+  ;
+
+  .interaction {
+    pointer-events: auto;
+    width: calc(1.5rem * var(--scale-factor));
+    height: calc(1.5rem * var(--scale-factor));
+
+    @apply
+      z-10
+      absolute
+      bg-white
+      border
+      border-gray-500
+      text-gray-500
+      flex
+      items-center
+      justify-center
+      rounded-full
+      shadow
+      transition
+      duration-300
+      hover:scale-120
+    ;
+
+    &:before {
+      content: '';
+      font-size: calc(1rem * var(--scale-factor));
+
+      @apply
+        block
+        w-full
+        relative
+      ;
+    }
+
+    &.audio {
+      &:before {
+        @apply
+          i-ph:speaker-high
+        ;
+      }
+    }
+
+    &.video {
+      &:before {
+        @apply
+          i-ph:video
+        ;
+      }
+    }
+
+    &.pending {
+      .status {
+        &:before {
+          @apply
+            animate-ping
+            bg-blue-500
+            opacity-75
+          ;
+        }
+
+        &:after {
+          @apply
+            bg-blue-500
+          ;
+        }
+      }
+    }
+
+    &.completed {
+      .status {
+        &:before {
+          @apply
+            bg-green-500
+          ;
+        }
+
+        &:after {
+          /*@apply bg-white i-ph:check;*/
+        }
+      }
+    }
+
+    .status {
+      width: calc(0.7rem * var(--scale-factor));
+      height: calc(0.7rem * var(--scale-factor));
+      top: calc(-0.2rem * var(--scale-factor));
+      right: calc(-0.2rem * var(--scale-factor));
+
+      @apply
+        absolute
+        flex
+        items-center
+        justify-center
+      ;
+
+      &:before {
+        content: '';
+
+        @apply
+          absolute
+          inline-flex
+          h-full w-full
+          rounded-full
+        ;
+      }
+
+      &:after {
+        content: '';
+        width: calc(0.7rem * var(--scale-factor));
+        height: calc(0.7rem * var(--scale-factor));
+
+        @apply
+          relative
+          inline-flex
+          rounded-full
+        ;
+      }
+    }
+  }
+}
+
+.interactions {
+  @apply text-gray-700 divide-y;
+
+  >header {
+    @apply py-6 px-4 space-y-1 flex flex-col;
+
+    .interaction-summary {
+      @apply flex items-center justify-between gap-2;
+
+      .interaction-summary-title {
+        @apply text-lg font-semibold;
+
+      }
+      .interaction-summary-value {
+        @apply text-sm;
+      }
+    }
+
+    .interaction-filter {
+      @apply flex items-center gap-2 pt-2 justify-center;
+
+      input {
+        @apply scale-120;
+      }
+
+      span {
+        @apply text-sm;
+      }
+    }
+  }
+
+  &:has(.interaction-filter input:checked) .interaction-list {
+    .interaction-status-completed {
+      @apply hidden;
+    }
+  }
+
+  .interaction-list {
+    @apply p-4;
+
+    >li {
+      @apply flex;
+    }
+
+    .interaction {
+      @apply flex gap-2 items-center px-3 py-2 text-sm hover:scale-110 transition w-full;
+
+      .interaction-icon {
+        @apply
+          bg-white
+          border
+          border-gray-500
+          text-gray-500
+          flex
+          items-center
+          justify-center
+          rounded-full
+          shadow
+          transition
+          duration-300
+          w-6
+          h-6
+        ;
+
+        &:before {
+          content: '';
+
+          @apply
+            i-ph:speaker-high
+          ;
+        }
+      }
+
+      .interaction-title {
+        @apply flex-1 text-left;
+      }
+
+      .interaction-status {
+        @apply bg-blue-500 text-white rounded-full w-4 h-4;
+      }
+
+      &.interaction-status-pending .interaction-status {
+        @apply bg-blue-500;
+      }
+
+      &.interaction-status-in-progress .interaction-status {
+        @apply bg-orange-500;
+      }
+
+      &.interaction-status-completed .interaction-status {
+        @apply bg-green-500;
+      }
+    }
+  }
+}

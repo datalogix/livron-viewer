@@ -1,0 +1,19 @@
+.toolbar-item-information > button:before {
+  @apply i-ph:info;
+}
+
+.information {
+  @apply divide-y gap-6;
+
+  li {
+    @apply p-4;
+
+    .title {
+      @apply block font-semibold mb-1;
+    }
+
+    .description {
+      @apply block text-sm;
+    }
+  }
+}
