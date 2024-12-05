@@ -1,9 +1,8 @@
+dist
 node_modules
-*.iml
-.idea
-*.log*
+coverage
 .vscode
 .DS_Store
-coverage
-dist
-src/_x
+.eslintcache
+*.log*
+*.env*

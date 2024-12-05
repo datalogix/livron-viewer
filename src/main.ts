@@ -1,3 +1,7 @@
+import 'virtual:uno.css'
+import '@unocss/reset/tailwind.css'
+import './styles/index.scss'
+
 import { Livron } from '.'
 
 (async () => {
