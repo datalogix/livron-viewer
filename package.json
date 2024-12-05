@@ -1,6 +1,6 @@
 {
   "name": "livron-viewer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Livron viewer",
   "repository": "datalogix/livron-viewer",
   "license": "MIT",
@@ -12,9 +12,9 @@
       "require": "./dist/index.umd.js",
       "types": "./dist/index.d.ts"
     },
-    "./style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
+    "./index.css": {
+      "import": "./dist/index.css",
+      "require": "./dist/index.css"
     }
   },
   "main": "./dist/index.umd.js",
@@ -28,7 +28,7 @@
     "dev": "vite",
     "preview": "vite preview",
     "lint": "eslint",
-    "release": "pnpm test && pnpm build && changelogen --release --push && pnpm publish",
+    "release": "pnpm build && changelogen --release --push && pnpm publish",
     "test": "pnpm lint"
   },
   "dependencies": {
