@@ -20,13 +20,13 @@ export default defineConfig({
       ],
     }),
   ],
-  build: {
+  /* build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name,
       fileName: format => `index.${format}.js`,
     },
-  },
+  }, */
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
