@@ -11,3 +11,7 @@ export function removeNullCharacters(str: string, replaceInvisible?: boolean) {
 
   return str.replaceAll('\x00', '')
 }
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}

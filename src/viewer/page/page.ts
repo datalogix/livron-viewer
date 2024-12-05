@@ -1,5 +1,5 @@
-import { RenderingCancelledException, type OptionalContentConfig, type RenderTask } from '@/pdfjs'
-import { updateLayerDimensions } from '@/utils'
+import { RenderingCancelledException, type OptionalContentConfig, type RenderTask, type PDFPageProxy } from '@/pdfjs'
+import { applyHighlightHCMFilter, updateLayerDimensions } from '@/utils'
 import { AnnotationLayerBuilder } from '../layers'
 import { RenderView } from '../rendering'
 import { CanvasPage } from './canvas-page'
@@ -19,13 +19,16 @@ export class Page extends RenderView {
   constructor(readonly options: PageOptions) {
     super(options)
 
-    this.canvasPage = new CanvasPage(this, options.maxCanvasPixels)
-    this.layersPage = new LayersPage(this, options.layerBuilders ?? [])
+    this.canvasPage = new CanvasPage(this, this.options.maxCanvasPixels)
+    this.layersPage = new LayersPage(this, this.options.layerBuilders)
 
     this.div.setAttribute('role', 'region')
+    this.div.setAttribute('aria-label', this.options.l10n.get('page.title', { page: this.id }))
     this.options.container?.append(this.div)
 
-    this.updateOptionalContentConfigPromise(options.optionalContentConfigPromise)
+    if (this.options.isStandalone) {
+      this.updateOptionalContentConfigPromise(this.options.optionalContentConfigPromise)
+    }
   }
 
   get width() {
@@ -40,8 +43,18 @@ export class Page extends RenderView {
     return this.canvasPage.canvas
   }
 
+  setPdfPage(pdfPage: PDFPageProxy) {
+    if (this.options.isStandalone) {
+      applyHighlightHCMFilter(this.div, this.options.pageColors, pdfPage.filterFactory)
+    }
+
+    super.setPdfPage(pdfPage)
+  }
+
   protected updateDimensions() {
-    this.options.container?.style.setProperty('--scale-factor', this.viewport.scale.toString())
+    if (this.options.isStandalone) {
+      this.options.container?.style.setProperty('--scale-factor', this.viewport.scale.toString())
+    }
 
     if (this.pdfPage) {
       if (this.previousRotation === this.viewport.rotation) {
@@ -142,17 +155,19 @@ export class Page extends RenderView {
   }
 
   protected async render() {
-    this.canvasPage.render()
+    const transform = this.canvasPage.render()
+
     await this.layersPage.init()
     this.canvasPage.show(false)
 
     return this.pdfPage!.render({
       canvasContext: this.canvasPage.ctx!,
-      transform: this.canvasPage.transform,
+      transform,
       viewport: this.viewport,
       annotationMode: this.options.annotationMode,
       optionalContentConfigPromise: this.optionalContentConfigPromise,
       annotationCanvasMap: this.annotationCanvasMap,
+      pageColors: this.options.pageColors,
       isEditing: this.isEditing,
     })
   }
@@ -179,6 +194,7 @@ export class Page extends RenderView {
 
   setPageLabel(label?: string) {
     this.pageLabel = typeof label === 'string' ? label : undefined
+    this.div.setAttribute('aria-label', this.options.l10n.get('page.title', { page: this.pageLabel ?? this.id }))
 
     if (this.pageLabel !== undefined) {
       this.div.setAttribute('data-page-label', this.pageLabel)

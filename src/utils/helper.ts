@@ -14,13 +14,12 @@ export function debounce<T extends (...args: any[]) => void>(func: T, delay = 30
   }
 }
 
-export function expose(obj: any, exposer: any) {
+export function expose(obj: any, exposer: any, exclude?: string[]) {
   const prototype = Object.getPrototypeOf(exposer)
   const descriptors = Object.getOwnPropertyDescriptors(prototype)
-  const exclude = ['constructor', 'init', 'reset', 'refresh', 'update']
 
   for (const key in descriptors) {
-    if (exclude.includes(key)) {
+    if (exclude?.includes(key)) {
       continue
     }
 

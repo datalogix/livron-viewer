@@ -17,10 +17,10 @@ export class CopyPlugin extends Plugin {
       this.hiddenCopyElement = createElement('div', { id: 'hiddenCopyElement' })
       this.viewerContainer.before(this.hiddenCopyElement)
 
-      document.addEventListener('copy', this.onCopyListener, { signal: this.viewer.signal })
+      document.addEventListener('copy', this.onCopyListener, { signal: this.viewer.pagesManager.signal })
     })
 
-    this.on('documentdestroy', () => this.destroy())
+    this.on('pagesdestroy', () => this.destroy())
   }
 
   protected destroy() {
@@ -66,7 +66,7 @@ export class CopyPlugin extends Plugin {
         await navigator.clipboard.writeText(text)
       }
     }).catch((reason) => {
-      console.warn(`Something goes wrong when extracting the text: ${reason.message}`)
+      this.logger.warn('Something goes wrong when extracting the text', reason)
     }).finally(() => {
       this.getAllTextInProgress = false
       this.interruptCopyCondition = false

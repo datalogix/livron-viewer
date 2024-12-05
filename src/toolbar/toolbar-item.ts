@@ -11,7 +11,7 @@ export abstract class ToolbarItem extends Dispatcher {
   protected abortController?: AbortController
 
   get name() {
-    return this.constructor.name.toLowerCase()
+    return this.constructor.name.toLowerCase().replace('toolbaritem', '')
   }
 
   get className() {
@@ -34,11 +34,19 @@ export abstract class ToolbarItem extends Dispatcher {
     return this.abortController?.signal
   }
 
+  get l10n() {
+    return this.viewer.l10n
+  }
+
+  get logger() {
+    return this.viewer.logger
+  }
+
   setToolbar(toolbar: Toolbar) {
     this._toolbar = toolbar
   }
 
-  async initialize(enabled?: boolean) {
+  async initialize() {
     if (this.initialized) return
 
     this.initialized = true
@@ -48,11 +56,6 @@ export abstract class ToolbarItem extends Dispatcher {
     await this.init()
 
     this.dispatch(`toolbaritem${this.name}init`)
-    this.on('documentinit', () => this.onInit(enabled))
-
-    if (enabled) {
-      queueMicrotask(() => this.onInit(enabled))
-    }
   }
 
   async terminate() {
@@ -68,10 +71,6 @@ export abstract class ToolbarItem extends Dispatcher {
     this.abortController?.abort()
     this.abortController = undefined
     // this.container.remove()
-  }
-
-  protected onInit(_enabled?: boolean): Promise<void> | void {
-
   }
 
   protected init(): Promise<void> | void {

@@ -25,15 +25,6 @@ export class ZoomLayerBuilder extends LayerBuilder {
     return false
   }
 
-  protected create() {
-    if (!this.canvas) return
-
-    if (!this.div && !this.canvas.hidden) {
-      this.div = this.canvas.parentNode as HTMLDivElement
-      this.div.style.position = 'absolute'
-    }
-  }
-
   hide() {
     if (this.canvas) {
       this._viewportMap.delete(this.canvas)
@@ -45,7 +36,10 @@ export class ZoomLayerBuilder extends LayerBuilder {
   }
 
   update() {
-    this.create()
+    if (!this.div && this.canvas && !this.canvas.hidden) {
+      this.div = this.canvas.parentNode as HTMLDivElement
+      this.div.style.position = 'absolute'
+    }
 
     if (this.div) {
       this.render()

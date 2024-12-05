@@ -1,7 +1,8 @@
 import type { EventBus } from '@/bus'
+import type { IL10n } from '@/l10n'
 import type { OptionalContentConfig, PageViewport } from '@/pdfjs'
 import { createElement } from '@/utils'
-import { type Page, type RenderingQueue, RenderView } from '@/viewer'
+import { LayerPropertiesManager, type Page, type PageColors, type RenderingQueue, RenderView } from '@/viewer'
 import { createScaledCanvasContext, reduceImage } from './helpers'
 import { ThumbnailLayerBuilder } from './thumbnail-layer-builder'
 
@@ -23,6 +24,8 @@ export class Thumbnail extends RenderView {
   constructor(readonly options: {
     container: HTMLDivElement
     eventBus: EventBus
+    l10n: IL10n
+    layerProperties: LayerPropertiesManager
     id: number
     viewport: PageViewport
     scale?: number
@@ -30,12 +33,17 @@ export class Thumbnail extends RenderView {
     renderingQueue?: RenderingQueue
     optionalContentConfigPromise?: Promise<OptionalContentConfig>
     enableHWA?: boolean
+    pageColors?: PageColors
   }) {
     super(options)
 
-    this.anchor.setAttribute('data-l10n-id', 'pdfjs-thumb-page-title')
-    this.anchor.setAttribute('data-l10n-args', this.pageL10nArgs)
-    this.anchor.addEventListener('click', () => this.dispatch('thumbnailclick', options.id))
+    this.anchor.setAttribute('title', options.l10n.get('thumbnail.title', { page: this.pageLabel ?? this.id }))
+    this.anchor.setAttribute('href', options.layerProperties.locationManager.getAnchorUrl(`#page=${options.id}`))
+    this.anchor.addEventListener('click', (e) => {
+      e.preventDefault()
+      options.layerProperties.pagesManager.currentPageNumber = options.id
+      this.dispatch('thumbnailclick', { pageNumber: options.id })
+    })
 
     this.div.append(this.placeholderImg)
     this.anchor.append(this.div)
@@ -96,8 +104,7 @@ export class Thumbnail extends RenderView {
 
     this.image = createElement('img', 'thumbnailImage', {
       'src': reducedCanvas.toDataURL(),
-      'data-l10n-id': 'pdfjs-thumb-page-canvas',
-      'data-l10n-args': this.pageL10nArgs,
+      'aria-label': this.options.l10n.get('thumbnail.image', { page: this.pageLabel ?? this.id }),
     })
 
     this.div.setAttribute('data-loaded', 'true')
@@ -130,6 +137,7 @@ export class Thumbnail extends RenderView {
       transform,
       viewport: this.viewport.clone({ scale: DRAW_UPSCALE_FACTOR * this.scale }),
       optionalContentConfigPromise: this.options.optionalContentConfigPromise,
+      pageColors: this.options.pageColors,
     })
   }
 
@@ -156,18 +164,21 @@ export class Thumbnail extends RenderView {
     this.convertCanvasToImage(canvas)
   }
 
-  get pageL10nArgs() {
-    return JSON.stringify({ page: this.pageLabel ?? this.id })
-  }
-
   setPageLabel(label?: string) {
     this.pageLabel = typeof label === 'string' ? label : undefined
-    this.anchor.setAttribute('data-l10n-args', this.pageL10nArgs)
+
+    this.anchor.setAttribute(
+      'title',
+      this.options.l10n.get('thumbnail.title', { page: this.pageLabel ?? this.id }),
+    )
 
     if (!this.isRenderingFinished) {
       return
     }
 
-    this.image?.setAttribute('data-l10n-args', this.pageL10nArgs)
+    this.image?.setAttribute(
+      'aria-label',
+      this.options.l10n.get('thumbnail.image', { page: this.pageLabel ?? this.id }),
+    )
   }
 }

@@ -25,7 +25,7 @@ export class XfaLayerBuilder extends LayerBuilder {
       div: this.div = createElement('div', 'xfaLayer'),
       viewport: this.viewport.clone({ dontFlip: true }),
       xfaHtml,
-      annotationStorage: this.layerProperties.documentManager.pdfDocument?.annotationStorage,
+      annotationStorage: this.pdfDocument?.annotationStorage,
     } as XfaLayerParameters)
 
     await this.buildXfaTextContentItems(textDivs)

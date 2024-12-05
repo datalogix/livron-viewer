@@ -2,58 +2,91 @@ import * as plugins from '@/plugins'
 import * as toolbar from '@/toolbar'
 
 export const DEFAULT_PLUGINS: plugins.PluginType[] = [
-  plugins.ZoomPlugin,
+  plugins.BookmarkPlugin,
+  plugins.CopyPlugin,
+  plugins.CursorPlugin,
+  plugins.DownloadPlugin,
+  plugins.FindPlugin,
+  plugins.InteractionPlugin,
+  plugins.LoadingPlugin,
+  plugins.LibraryPlugin,
+  plugins.NotifyPlugin,
+  plugins.PresentationPlugin,
+  plugins.PrintPlugin,
   plugins.ResizePlugin,
   plugins.ResolutionPlugin,
-  plugins.PresentationPlugin,
-  plugins.CursorPlugin,
-  plugins.PlayerPlugin,
-  plugins.BookmarkPlugin,
-  plugins.InteractionPlugin,
-  plugins.CopyPlugin,
-  plugins.FindPlugin,
-  plugins.TextHighlighterPlugin,
+  plugins.ScriptingPlugin,
+  plugins.StoragePlugin,
   plugins.ThumbnailPlugin,
-  plugins.TextAccessibilityPlugin,
-  plugins.LibraryPlugin,
+  plugins.ZoomPlugin,
 ]
 
 export const DEFAULT_TOOLBAR = [
   'sidebar find paginate',
   'zoom-out zoom-in zoom-select',
-  'library menu',
+  'annotation menu',
 ]
 
 export const DEFAULT_TOOLBAR_ITEMS = new Map<string, toolbar.ToolbarItemType>([
+  // annotation
+  ['annotation', toolbar.Annotation],
+
+  // cursor
+  ['cursor-hand', plugins.CursorHand],
+  ['cursor-select', plugins.CursorSelect],
+
+  // document
+  ['open', toolbar.Open],
+  ['download', plugins.DownloadToolbarItem],
+  ['print', plugins.PrintToolbarItem],
+  ['presentation', plugins.PresentationToolbarItem],
+
+  // find
+  ['find', plugins.FindToolbar],
+
+  // information
+  ['information', toolbar.Information],
+
+  // library
+  ['library', plugins.LibraryToolbarItem],
+
+  // pagination
+  ['current-page', toolbar.CurrentPage],
   ['first-page', toolbar.FirstPage],
-  ['last-page', toolbar.LastPage],
-  ['prev-page', toolbar.PrevPage],
-  ['next-page', toolbar.NextPage],
   ['input-page', toolbar.InputPage],
+  ['last-page', toolbar.LastPage],
+  ['next-page', toolbar.NextPage],
+  ['prev-page', toolbar.PrevPage],
   ['paginate', toolbar.Paginate],
-  ['cursor-hand', toolbar.CursorHand],
-  ['cursor-select', toolbar.CursorSelect],
-  ['zoom-out', toolbar.ZoomOut],
-  ['zoom-in', toolbar.ZoomIn],
-  ['zoom-select', toolbar.ZoomSelect],
-  ['spread-even', toolbar.SpreadEven],
-  ['spread-odd', toolbar.SpreadOdd],
-  ['spread-none', toolbar.SpreadNone],
-  ['spread-group', toolbar.SpreadGroup],
+
+  // rotate
   ['rotate-cw', toolbar.RotateCw],
   ['rotate-ccw', toolbar.RotateCcw],
+
+  // scroll
+  ['scroll-group', toolbar.ScrollGroup],
+  ['scroll-horizontal', toolbar.ScrollHorizontal],
   ['scroll-page', toolbar.ScrollPage],
   ['scroll-vertical', toolbar.ScrollVertical],
-  ['scroll-horizontal', toolbar.ScrollHorizontal],
   ['scroll-wrapped', toolbar.ScrollWrapped],
-  ['scroll-group', toolbar.ScrollGroup],
-  ['presentation-mode', toolbar.PresentationMode],
+
+  // spread
+  ['spread-even', toolbar.SpreadEven],
+  ['spread-group', toolbar.SpreadGroup],
+  ['spread-none', toolbar.SpreadNone],
+  ['spread-odd', toolbar.SpreadOdd],
+
+  // zoom
+  ['zoom-in', toolbar.ZoomIn],
+  ['zoom-out', toolbar.ZoomOut],
+  ['zoom-select', toolbar.ZoomSelect],
+
+  // ui
   ['menu', toolbar.Menu],
-  ['progress-tracker', toolbar.ProgressTracker],
   ['sidebar', new toolbar.Sidebar(new Map<string, toolbar.SidebarItem>([
-    ['thumbnail', new plugins.ThumbnailSidebar()],
-    ['interaction', new plugins.InteractionSidebar()],
-    ['bookmark', new plugins.BookmarkSidebar()],
+    ['thumbnail', new plugins.ThumbnailSidebarItem()],
+    ['bookmark', new plugins.BookmarkSidebarItem()],
+    ['interaction', new plugins.InteractionSidebarItem()],
   ]))],
 ])
 

@@ -1,13 +1,19 @@
-import { EventBus } from '@/bus'
-import { expose } from '@/utils'
+import { Dispatcher, EventBus } from '@/bus'
+import { type IL10n, L10n } from '@/l10n'
+import { expose, resolvePageColors } from '@/utils'
 import * as managers from './managers'
-import type { PageUpdate, ViewerOptions } from './'
+import { Logger } from './logger'
+import type { PageColors, PageUpdate, ViewerOptions } from './'
 
-export class Viewer {
+export class Viewer extends Dispatcher {
   readonly eventBus: EventBus
+  readonly l10n: IL10n
+  readonly pageColors?: PageColors
   readonly annotationManager: managers.AnnotationManager
   readonly containerManager: managers.ContainerManager
   readonly documentManager: managers.DocumentManager
+  readonly documentPropertiesManager: managers.DocumentPropertiesManager
+  readonly initializerManager: managers.InitializerManager
   readonly layerBuildersManager: managers.LayerBuildersManager
   readonly layerPropertiesManager: managers.LayerPropertiesManager
   readonly locationManager: managers.LocationManager
@@ -21,41 +27,45 @@ export class Viewer {
   readonly scrollManager: managers.ScrollManager
   readonly spreadManager: managers.SpreadManager
   protected managers: Set<managers.Manager>
+  readonly logger = new Logger()
 
   constructor(readonly options: ViewerOptions = {}) {
+    super()
     this.eventBus = options.eventBus ?? new EventBus()
+    this.l10n = options.l10n ?? new L10n()
+    this.pageColors = options.pageColors ?? resolvePageColors()
     this.managers = new Set([
       this.annotationManager = new managers.AnnotationManager(this),
       this.containerManager = new managers.ContainerManager(this),
-      this.optionalContentManager = new managers.OptionalContentManager(this),
-      this.pagesManager = new managers.PagesManager(this),
+      this.documentManager = new managers.DocumentManager(this),
+      this.documentPropertiesManager = new managers.DocumentPropertiesManager(this),
+      this.initializerManager = new managers.InitializerManager(this),
       this.layerBuildersManager = new managers.LayerBuildersManager(this),
       this.layerPropertiesManager = new managers.LayerPropertiesManager(this),
-      this.documentManager = new managers.DocumentManager(this),
-      this.scrollManager = new managers.ScrollManager(this),
-      this.scaleManager = new managers.ScaleManager(this),
-      this.spreadManager = new managers.SpreadManager(this),
+      this.locationManager = new managers.LocationManager(this),
+      this.optionalContentManager = new managers.OptionalContentManager(this),
+      this.pageLabelsManager = new managers.PageLabelsManager(this),
+      this.pagesManager = new managers.PagesManager(this),
       this.presentationManager = new managers.PresentationManager(this),
       this.renderManager = new managers.RenderManager(this),
       this.rotationManager = new managers.RotationManager(this),
-      this.locationManager = new managers.LocationManager(this),
-      this.pageLabelsManager = new managers.PageLabelsManager(this),
+      this.scaleManager = new managers.ScaleManager(this),
+      this.scrollManager = new managers.ScrollManager(this),
+      this.spreadManager = new managers.SpreadManager(this),
     ])
 
     this.managers.forEach((manager) => {
-      this.expose(manager)
+      if (manager.canExpose) {
+        this.expose(manager)
+      }
 
       manager.init()
       manager.reset()
     })
   }
 
-  get container() {
-    return this.containerManager.getContainer()
-  }
-
   render() {
-    return this.container
+    return this.containerManager.container
   }
 
   reset() {
@@ -83,6 +93,6 @@ export class Viewer {
   }
 
   private expose(manager: managers.Manager) {
-    expose(this, manager)
+    expose(this, manager, ['constructor', 'canExpose', 'init', 'reset', 'refresh', 'update', 'signal'])
   }
 }

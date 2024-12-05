@@ -51,6 +51,9 @@
       h-full
       text-center
       absolute
+      transition-all
+      ease
+      duration-500
     ;
 
     &.hidden {

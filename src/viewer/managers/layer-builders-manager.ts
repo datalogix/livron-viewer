@@ -3,13 +3,12 @@ import { Manager } from './'
 
 export class LayerBuildersManager extends Manager {
   private builders = new Set<layers.LayerBuilderType>([
+    layers.ZoomLayerBuilder,
+    layers.TextLayerBuilder,
     layers.AnnotationLayerBuilder,
     layers.AnnotationEditorLayerBuilder,
-    layers.DrawLayerBuilder,
     layers.XfaLayerBuilder,
-    layers.TextLayerBuilder,
     layers.StructTreeLayerBuilder,
-    layers.ZoomLayerBuilder,
   ])
 
   addLayerBuilder(layerBuilder: layers.LayerBuilderType) {

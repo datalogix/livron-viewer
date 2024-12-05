@@ -1,15 +1,47 @@
+import * as pdfjs from '@/pdfjs'
+import * as constants from '@/config'
 import { ScrollMode, SpreadMode } from '@/enums'
-import { isPortraitOrientation, VisibleElements } from '@/utils'
-import type { Page, PageUpdate } from '../page'
+import { initializePermissions, isPortraitOrientation, onePageRenderedOrForceFetch, VisibleElements } from '@/utils'
+import { Page, PageUpdate } from '../page'
 import { Manager } from './'
 
 export class PagesManager extends Manager {
   private _pages: Page[] = []
   private _currentPageNumber = 1
+  private firstPageCapability: PromiseWithResolvers<pdfjs.PDFPageProxy> = Promise.withResolvers()
+  private onePageRenderedCapability: PromiseWithResolvers<{ timestamp: number }> = Promise.withResolvers()
+  private pagesCapability: PromiseWithResolvers<void> = Promise.withResolvers()
+  private abortController?: AbortController
+
+  get firstPagePromise() {
+    return this.pdfDocument ? this.firstPageCapability.promise : null
+  }
+
+  get onePageRendered() {
+    return this.pdfDocument ? this.onePageRenderedCapability.promise : null
+  }
+
+  get pagesPromise() {
+    return this.pdfDocument ? this.pagesCapability.promise : null
+  }
+
+  get signal() {
+    return this.abortController?.signal
+  }
+
+  init() {
+    this.on('documentinit', ({ pdfDocument }) => this.setupPages(pdfDocument))
+    this.on('documentdestroy', () => this.dispatch('pagesdestroy'), { signal: this.options.abortSignal })
+  }
 
   reset() {
     this._pages = []
     this._currentPageNumber = 1
+    this.firstPageCapability = Promise.withResolvers()
+    this.onePageRenderedCapability = Promise.withResolvers()
+    this.pagesCapability = Promise.withResolvers()
+    this.abortController?.abort()
+    this.abortController = undefined
   }
 
   refresh(params: PageUpdate) {
@@ -69,7 +101,7 @@ export class PagesManager extends Manager {
     }
 
     if (!this.setCurrentPageNumber(val, true)) {
-      console.error(`currentPageNumber: '${val}' is not a valid page.`)
+      this.logger.error(`currentPageNumber: '${val}' is not a valid page.`)
     }
   }
 
@@ -165,10 +197,11 @@ export class PagesManager extends Manager {
     return this.pages.map((page) => {
       const viewport = page.pdfPage!.getViewport({ scale: 1 })
       const orientation = isPortraitOrientation(viewport)
+      const enablePrintAutoRotate = this.options.enablePrintAutoRotate ?? true
 
       if (initialOrientation === undefined) {
         initialOrientation = orientation
-      } else if (this.options.enablePrintAutoRotate && orientation !== initialOrientation) {
+      } else if (enablePrintAutoRotate && orientation !== initialOrientation) {
         return {
           width: viewport.height,
           height: viewport.width,
@@ -290,5 +323,143 @@ export class PagesManager extends Manager {
     }
 
     return 1
+  }
+
+  private setupPages(pdfDocument: pdfjs.PDFDocumentProxy) {
+    const pagesCount = pdfDocument.numPages
+    const firstPagePromise = pdfDocument.getPage(1)
+    const optionalContentConfigPromise = pdfDocument.getOptionalContentConfig({ intent: 'display' })
+    const permissionsPromise = this.options.enablePermissions ? pdfDocument.getPermissions() : Promise.resolve()
+
+    this.abortController = new AbortController()
+    const { signal } = this.abortController
+
+    if (pagesCount > constants.FORCE_SCROLL_MODE_PAGE) {
+      this.logger.warn('Forcing PAGE-scrolling for performance reasons, given the length of the document.')
+      const mode = this.scrollManager.scrollMode = ScrollMode.PAGE
+      this.dispatch('scrollmodechanged', { mode })
+    }
+
+    this.pagesCapability.promise.then(() => {
+      this.dispatch('pagesloaded', { pagesCount })
+    }, () => { })
+
+    const onBeforeDraw = (evt: { pageNumber: number }) => {
+      const page = this.pages[evt.pageNumber - 1]
+      if (!page) return
+      this.renderManager.buffer.push(page)
+    }
+
+    const onAfterDraw = (evt: { cssTransform: boolean, timestamp: number }) => {
+      if (evt.cssTransform) return
+      this.onePageRenderedCapability.resolve({ timestamp: evt.timestamp })
+      this.off('pagerendered', onAfterDraw)
+    }
+
+    this.on('pagerender', onBeforeDraw, { signal })
+    this.on('pagerendered', onAfterDraw, { signal })
+
+    Promise.all([firstPagePromise, permissionsPromise]).then(([firstPdfPage, permissions]) => {
+      if (pdfDocument !== this.pdfDocument) {
+        return
+      }
+
+      this.firstPageCapability.resolve(firstPdfPage)
+      this.optionalContentManager.optionalContentConfig = optionalContentConfigPromise
+
+      const params = initializePermissions(permissions ?? undefined, this.options)
+      const viewport = firstPdfPage.getViewport({ scale: this.currentScale * pdfjs.PixelsPerInch.PDF_TO_CSS_UNITS })
+
+      this.dispatch('firstpageloaded', { pdfDocument, firstPdfPage, viewport, ...params })
+
+      const layerBuilders = this.layerBuildersManager.layersToArray()
+      const container = this.scrollMode === ScrollMode.PAGE ? undefined : this.viewerContainer
+
+      for (let pageNum = 1; pageNum <= pagesCount; ++pageNum) {
+        this.pages.push(new Page({
+          id: pageNum,
+          viewport: viewport.clone(),
+          eventBus: this.eventBus,
+          l10n: this.viewer.l10n,
+          container,
+          scale: this.currentScale,
+          rotation: this.rotation,
+          optionalContentConfigPromise,
+          renderingQueue: this.renderingQueue,
+          maxCanvasPixels: this.options.maxCanvasPixels,
+          textLayerMode: params.textLayerMode,
+          imageResourcesPath: this.options.imageResourcesPath,
+          annotationMode: params.annotationMode,
+          layerBuilders,
+          layerProperties: this.viewer.layerPropertiesManager,
+          enableHWA: this.options.enableHWA,
+          pageColors: this.viewer.pageColors,
+        }))
+      }
+
+      this.pages[0]?.setPdfPage(firstPdfPage)
+
+      if (this.scrollManager.scrollMode === ScrollMode.PAGE) {
+        this.scrollManager.ensurePageVisible()
+      } else if (this.spreadManager.spreadMode !== SpreadMode.NONE) {
+        this.spreadManager.updateSpreadMode()
+      }
+
+      if (this.scaleManager.currentScaleValue) {
+        this.scaleManager.setScale(this.scaleManager.currentScaleValue, { noScroll: false })
+      }
+
+      onePageRenderedOrForceFetch(
+        this.container,
+        this.scrollManager.getVisiblePages(),
+        this.onePageRenderedCapability.promise,
+        signal,
+      ).then(async () => {
+        if (pdfDocument !== this.pdfDocument) {
+          return
+        }
+
+        this.dispatch('onepagerendered', { pdfDocument, firstPdfPage, viewport, ...params })
+
+        if (pdfDocument.loadingParams.disableAutoFetch || pagesCount > constants.FORCE_LAZY_PAGE_INIT) {
+          this.pagesCapability.resolve()
+          return
+        }
+
+        let getPagesLeft = pagesCount - 1
+
+        if (getPagesLeft <= 0) {
+          this.pagesCapability.resolve()
+          return
+        }
+
+        for (let pageNum = 2; pageNum <= pagesCount; ++pageNum) {
+          const promise = pdfDocument.getPage(pageNum).then((pdfPage) => {
+            const page = this.pages[pageNum - 1]
+            if (!page.pdfPage) {
+              page.setPdfPage(pdfPage)
+            }
+            if (--getPagesLeft === 0) {
+              this.pagesCapability.resolve()
+            }
+          }, (reason) => {
+            this.logger.error(`Unable to get page ${pageNum} to initialize viewer`, reason)
+            if (--getPagesLeft === 0) {
+              this.pagesCapability.resolve()
+            }
+          })
+
+          if (pageNum % constants.PAUSE_EAGER_PAGE_INIT === 0) {
+            await promise
+          }
+        }
+      })
+
+      this.dispatch('pagesinit', { pdfDocument })
+      queueMicrotask(() => this.viewer.update())
+    }).catch((reason) => {
+      this.logger.error('Unable to initialize viewer', reason)
+      this.pagesCapability.reject(reason)
+    })
   }
 }

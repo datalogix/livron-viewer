@@ -3,6 +3,10 @@ import { Manager } from './'
 export class PageLabelsManager extends Manager {
   private _pageLabels?: string[]
 
+  init() {
+    this.on('documentinit', () => this.getPageLabels())
+  }
+
   reset() {
     this._pageLabels = undefined
   }
@@ -20,7 +24,7 @@ export class PageLabelsManager extends Manager {
       this._pageLabels = undefined
     } else if (!(Array.isArray(labels) && this.pdfDocument.numPages === labels.length)) {
       this._pageLabels = undefined
-      console.error('setPageLabels: Invalid page labels.')
+      this.logger.error('setPageLabels: Invalid page labels.')
     } else {
       this._pageLabels = labels
     }
@@ -49,7 +53,7 @@ export class PageLabelsManager extends Manager {
     }
 
     if (!this.pagesManager.setCurrentPageNumber(page, true)) {
-      console.error(`currentPageLabel: '${val}' is not a valid page.`)
+      this.logger.error(`currentPageLabel: '${val}' is not a valid page.`)
     }
   }
 
@@ -65,5 +69,40 @@ export class PageLabelsManager extends Manager {
     }
 
     return i + 1
+  }
+
+  private async getPageLabels() {
+    if (!this.pdfDocument) {
+      return
+    }
+
+    const labels = await this.pdfDocument.getPageLabels()
+
+    if (!labels) {
+      return
+    }
+
+    const numLabels = labels.length
+
+    let standardLabels = 0
+    let emptyLabels = 0
+
+    for (let i = 0; i < numLabels; i++) {
+      const label = labels[i]
+      if (label === (i + 1).toString()) {
+        standardLabels++
+      } else if (label === '') {
+        emptyLabels++
+      } else {
+        break
+      }
+    }
+
+    if (standardLabels >= numLabels || emptyLabels >= numLabels) {
+      return
+    }
+
+    this.pageLabels = labels
+    this.dispatch('pagelabels', { labels })
   }
 }

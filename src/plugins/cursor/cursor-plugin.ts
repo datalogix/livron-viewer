@@ -1,7 +1,9 @@
 import { AnnotationEditorType } from '@/pdfjs'
 import { PresentationModeState } from '@/enums'
-import { Plugin } from '../plugin'
+import { Plugin, type ToolbarItemType } from '../plugin'
 import { HandTool } from './hand-tool'
+import { CursorHand } from './cursor-hand'
+import { CursorSelect } from './cursor-select'
 
 export enum CursorTool {
   SELECT = 0,
@@ -9,6 +11,13 @@ export enum CursorTool {
 }
 
 export class CursorPlugin extends Plugin {
+  protected getToolbarItems() {
+    return new Map<string, ToolbarItemType>([
+      ['cursor-hand', CursorHand],
+      ['cursor-select', CursorSelect],
+    ])
+  }
+
   private active = CursorTool.SELECT
   private prevActive?: CursorTool
   private handTool?: HandTool
@@ -110,7 +119,7 @@ export class CursorPlugin extends Plugin {
         this.handTool?.activate()
         break
       default:
-        console.error(`switchTool: '${tool}' is an unsupported value.`)
+        this.logger.error(`switchTool: '${tool}' is an unsupported value.`)
         return
     }
 

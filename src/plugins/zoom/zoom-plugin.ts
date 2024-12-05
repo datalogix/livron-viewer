@@ -23,6 +23,10 @@ export class ZoomPlugin extends Plugin {
     touch1Y: number
   }
 
+  constructor(readonly supportsPinchToZoom = true) {
+    super()
+  }
+
   protected init() {
     window.addEventListener('keydown', this.onKeyDownListener, { signal: this.signal })
     window.addEventListener('keyup', this.onKeyUpListener, { signal: this.signal })
@@ -101,7 +105,7 @@ export class ZoomPlugin extends Plugin {
       return
     }
 
-    if (isPinchToZoom && (this.viewer.options.supportsPinchToZoom || this.viewer.options.supportsPinchToZoom === undefined)) {
+    if (isPinchToZoom && this.supportsPinchToZoom) {
       scaleFactor = this.accumulateFactor(
         this.viewer.currentScale,
         scaleFactor,
@@ -239,7 +243,7 @@ export class ZoomPlugin extends Plugin {
     const distance = Math.hypot(page0X - page1X, page0Y - page1Y) || 1
     const pDistance = Math.hypot(pTouch0X - pTouch1X, pTouch0Y - pTouch1Y) || 1
 
-    if (this.viewer.options.supportsPinchToZoom || this.viewer.options.supportsPinchToZoom === undefined) {
+    if (this.supportsPinchToZoom) {
       const newScaleFactor = this.accumulateFactor(this.viewer.currentScale, distance / pDistance, 'touchUnusedFactor')
 
       this.viewer.updateZoom({

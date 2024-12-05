@@ -1,22 +1,28 @@
 import { LayerBuilder } from '@/viewer'
 import { createElement } from '@/utils'
+import type { BookmarkPlugin } from './bookmark-plugin'
 
 export class BookmarkLayerBuilder extends LayerBuilder {
+  get bookmarkService() {
+    return this.layerProperties.getLayerProperty<BookmarkPlugin>('BookmarkPlugin')?.bookmarkService
+  }
+
   protected async build() {
-    this.create('bookmarkLayer', -1)
+    const div = this.create('bookmarkLayer', -1)
+    const button = div.appendChild(createElement('button', 'bookmark', { type: 'button' }))
+    button.addEventListener('click', () => this.bookmarkService?.addOrDelete(this.id))
 
-    const button = createElement('button', 'bookmark', { type: 'button' })
+    if (this.bookmarkService?.has(this.id)) {
+      button.classList.add('selected')
+    }
 
-    button.addEventListener('click', (_event: MouseEvent) => {
-      const x = window.prompt(`Marcar página ${this.page.id}`)
-
-      if (x !== null) {
+    this.on('bookmarkloaded', () => {
+      if (this.bookmarkService?.has(this.id)) {
         button.classList.add('selected')
       }
-
-      this.eventBus.dispatch('bookmarkadd', { pageNumber: this.page.id })
     })
 
-    this.div!.appendChild(button)
+    this.on(`bookmarkadded${this.id}`, () => button.classList.add('selected'))
+    this.on(`bookmarkdeleted${this.id}`, () => button.classList.remove('selected'))
   }
 }

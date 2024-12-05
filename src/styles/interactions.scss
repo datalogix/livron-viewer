@@ -86,17 +86,37 @@
 
     &.audio {
       &:before {
-        @apply
-          i-ph:speaker-high
-        ;
+        @apply i-ph:speaker-high;
       }
     }
 
     &.video {
       &:before {
-        @apply
-          i-ph:video
-        ;
+        @apply i-ph:video;
+      }
+    }
+
+    &.link {
+      &:before {
+        @apply i-ph:link;
+      }
+    }
+
+    &.question {
+      &:before {
+        @apply i-majesticons:hand-pointer-event-line;
+      }
+    }
+
+    &.iframe {
+      &:before {
+        @apply i-material-symbols-light:iframe-outline;
+      }
+    }
+
+    &.text {
+      &:before {
+        @apply i-ph:text;
       }
     }
 
@@ -208,15 +228,27 @@
     }
   }
 
-  .interaction-list {
-    @apply p-4;
+  .interaction-group {
+    @apply divide-y;
 
-    >li {
-      @apply flex;
+    .interaction-list {
+      @apply py-1;
+
+      >li {
+        @apply flex;
+      }
     }
 
     .interaction {
-      @apply flex gap-2 items-center px-3 py-2 text-sm hover:scale-110 transition w-full;
+      @apply flex gap-2 items-center py-4 px-6 text-sm hover:scale-110 transition hover:bg-gray-50 w-full;
+
+      .interaction-content {
+        @apply flex-1 flex flex-col gap-2;
+      }
+
+      .interaction-header {
+        @apply flex-1 flex gap-2 items-center text-left;
+      }
 
       .interaction-icon {
         @apply
@@ -238,10 +270,36 @@
         &:before {
           content: '';
 
-          @apply
-            i-ph:speaker-high
-          ;
+          @apply i-ph:question-mark;
         }
+      }
+
+      &.interaction-type-audio .interaction-icon:before {
+        @apply i-ph:speaker-high;
+      }
+
+      &.interaction-type-video .interaction-icon:before {
+        @apply i-ph:video;
+      }
+
+      &.interaction-type-question .interaction-icon:before {
+        @apply i-majesticons:hand-pointer-event-line;
+      }
+
+      &.interaction-type-iframe .interaction-icon:before {
+        @apply i-material-symbols-light:iframe-outline;
+      }
+
+      &.interaction-type-link .interaction-icon:before {
+        @apply i-ph:link;
+      }
+
+      &.interaction-type-text .interaction-icon:before {
+        @apply i-ph:text;
+      }
+
+      .interaction-page {
+        @apply font-semibold flex items-center gap-2;
       }
 
       .interaction-title {

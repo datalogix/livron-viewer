@@ -1,4 +1,5 @@
 import { Dispatcher, type EventBus } from '@/bus'
+import { DEFAULT_SCALE } from '@/config'
 import { RenderingStates } from '@/enums'
 import * as pdfjs from '@/pdfjs'
 import { createElement } from '@/utils'
@@ -20,21 +21,19 @@ export abstract class RenderView extends Dispatcher implements pdfjs.IRenderable
 
   resume: (() => void) | null = null
 
-  constructor(
-    readonly options: {
-      id: number
-      eventBus: EventBus
-      viewport: pdfjs.PageViewport
-      scale?: number
-      rotation?: number
-      renderingQueue?: RenderingQueue
-    },
-  ) {
+  constructor(readonly options: {
+    id: number
+    eventBus: EventBus
+    viewport: pdfjs.PageViewport
+    scale?: number
+    rotation?: number
+    renderingQueue?: RenderingQueue
+  }) {
     super()
 
-    this._viewport = options.viewport
-    this._scale = options.scale ?? 0
-    this._rotation = options.rotation ?? 0
+    this._viewport = this.options.viewport
+    this._scale = this.options.scale ?? DEFAULT_SCALE
+    this._rotation = this.options.rotation ?? 0
 
     this.div.classList.add(this.name)
     this.div.setAttribute('data-page-number', this.id.toString())
@@ -182,7 +181,6 @@ export abstract class RenderView extends Dispatcher implements pdfjs.IRenderable
 
   async draw() {
     if (!this.isRenderingInitial) {
-      console.error('Must be in new state before drawing')
       this.reset()
     }
 

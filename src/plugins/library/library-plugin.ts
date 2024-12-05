@@ -1,44 +1,27 @@
-import type { Book } from '@/index'
-import type { ToolbarItemType } from '@/toolbar'
-import { Plugin } from '../plugin'
-import { LibraryToolbar } from './library-toolbar'
-import { InformationToolbar } from './information-toolbar'
+import { Plugin, type ToolbarItemType } from '../plugin'
+import { LibraryToolbarItem } from './library-toolbar-item'
+import type { Book } from './types'
 
 export class LibraryPlugin extends Plugin {
   protected getToolbarItems() {
     return new Map<string, ToolbarItemType>([
-      ['library', LibraryToolbar],
-      ['information', InformationToolbar],
+      ['library', LibraryToolbarItem],
     ])
   }
 
-  protected init() {
-    this.on('toolbaritemmenuinit', ({ source: menu }) => {
-      menu.add(new InformationToolbar(), 0, 0)
-    })
+  private _books: Book[] = []
+  private _book?: Book
+
+  get books() {
+    return this._books
   }
 
-  private _book?: Book
+  set books(books) {
+    this._books = books
+  }
 
   get book() {
     return this._book
-  }
-
-  get books() {
-    return [
-      {
-        id: '1',
-        name: 'Livro 1',
-        src: './file.pdf',
-        cover: 'https://tailwindcss.com/_next/static/media/death-blow.bcfcabb1.jpg',
-      },
-      {
-        id: '2',
-        name: 'Livro 2',
-        src: './_file.pdf',
-        cover: 'https://tailwindcss.com/_next/static/media/rochelle-rochelle.b97e372a.jpg',
-      },
-    ] as Book[]
   }
 
   open(book: Book) {
@@ -47,6 +30,9 @@ export class LibraryPlugin extends Plugin {
     }
 
     this._book = book
-    this.viewer.loadDocument(book.src)
+
+    this.dispatch('interactionload', { interactions: book.interactions })
+
+    return this.viewer.openDocument(book.src)
   }
 }

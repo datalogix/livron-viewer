@@ -20,14 +20,6 @@ export abstract class ToolbarActionToggle extends ToolbarAction {
     return this._opened
   }
 
-  async terminate() {
-    if (!this.initialized) return
-
-    this.close()
-
-    await super.terminate()
-  }
-
   abstract open(): void
   abstract close(): void
 
@@ -39,5 +31,11 @@ export abstract class ToolbarActionToggle extends ToolbarAction {
     } else {
       this.close()
     }
+  }
+
+  disable() {
+    super.disable()
+    this.opened = false
+    this.close()
   }
 }

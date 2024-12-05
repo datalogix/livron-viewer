@@ -13,12 +13,24 @@ export class RenderingQueue {
   private highestPriority?: string
   private idleTimeout?: NodeJS.Timeout
   private handlers: Handler[] = []
-  printing = false
+  private _printing = false
 
   constructor(
     private render: Renderable,
     private onIdle?: () => void,
   ) { }
+
+  get printing() {
+    return this._printing
+  }
+
+  startPrinting() {
+    this._printing = true
+  }
+
+  stopPrinting() {
+    this._printing = false
+  }
 
   registerHandler(handler: Handler) {
     this.handlers.push(handler)
@@ -118,7 +130,7 @@ export class RenderingQueue {
 
       case RenderingStates.PAUSED:
         this.highestPriority = view.renderingId
-        view.resume?.()
+        if (view.resume) view.resume()
         break
 
       case RenderingStates.RUNNING:
@@ -135,7 +147,7 @@ export class RenderingQueue {
               return
             }
 
-            console.error(`renderView: '${reason}'`)
+            throw reason
           })
         break
     }

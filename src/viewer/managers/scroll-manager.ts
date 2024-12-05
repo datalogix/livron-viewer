@@ -14,7 +14,7 @@ export function isValidScrollMode(mode: number) {
 }
 
 export type ScrollDestination = undefined |
-  ['XYZ', number, number, number | undefined] |
+  ['XYZ', number, number, string | number | undefined] |
   ['Fit'] |
   ['FitB'] |
   ['FitH', number | undefined] |
@@ -41,7 +41,11 @@ export class ScrollManager extends Manager {
   private scroll = { right: true, down: true }
 
   init() {
-    this.scroll = watchScroll(this.container, this.onScrollUpdate.bind(this))
+    this.scroll = watchScroll(
+      this.container,
+      this.onScrollUpdate.bind(this),
+      this.signal,
+    )
   }
 
   reset() {
@@ -61,13 +65,10 @@ export class ScrollManager extends Manager {
       throw new Error('#ensurePageVisible: Invalid scrollMode value.')
     }
 
-    // Temporarily remove all the pages from the DOM...
     this.viewerContainer.textContent = ''
-    // ... and clear out the active ones.
     this.scrollModePageState.pages.length = 0
 
     if (this.spreadMode === SpreadMode.NONE && !this.isInPresentationMode) {
-      // Finally, append the new page to the viewer.
       const page = this.pages[this.currentPageNumber - 1]
       this.viewerContainer.append(page.div)
 
@@ -76,21 +77,16 @@ export class ScrollManager extends Manager {
       const pageIndexSet = new Set<number>(),
         parity = this.spreadMode - 1
 
-      // Determine the pageIndices in the new spread.
       if (parity === -1) {
-        // PresentationMode is active, with `SpreadMode.NONE` set.
         pageIndexSet.add(this.currentPageNumber - 1)
       } else if (this.currentPageNumber % 2 !== parity) {
-        // Left-hand side page.
         pageIndexSet.add(this.currentPageNumber - 1)
         pageIndexSet.add(this.currentPageNumber)
       } else {
-        // Right-hand side page.
         pageIndexSet.add(this.currentPageNumber - 2)
         pageIndexSet.add(this.currentPageNumber - 1)
       }
 
-      // Finally, append the new pages to the viewer and apply the spreadMode.
       const spread = createElement('div', 'spread')
 
       if (this.isInPresentationMode) {
@@ -176,7 +172,7 @@ export class ScrollManager extends Manager {
     const page = Number.isInteger(pageNumber) && this.pages[pageNumber - 1]
 
     if (!page) {
-      console.error(`scrollPageIntoView: '${pageNumber}' is not a valid pageNumber parameter.`)
+      this.logger.error(`scrollPageIntoView: '${pageNumber}' is not a valid pageNumber parameter.`)
       return
     }
 
@@ -252,7 +248,7 @@ export class ScrollManager extends Manager {
       }
 
       default:
-        console.error(`scrollPageIntoView: '${destination[0]}' is not a valid destination type.`)
+        this.logger.error(`scrollPageIntoView: '${destination[0]}' is not a valid destination type.`)
         return
     }
 

@@ -1,12 +1,32 @@
-import { createElement } from '@/utils'
+import { applyHighlightHCMFilter, createElement } from '@/utils'
 import { Manager } from './'
 
 export class ContainerManager extends Manager {
   private _container!: HTMLDivElement
   private _viewerContainer!: HTMLDivElement
   private previousContainerHeight = 0
-  private containerTopLeft?: [number, number]
+  private _containerTopLeft?: [number, number]
   private resizeObserver = new ResizeObserver(this.onResizeObserver.bind(this))
+
+  get rootContainer() {
+    return this.container.parentElement ?? this.container
+  }
+
+  get container() {
+    return this._container
+  }
+
+  get viewerContainer() {
+    return this._viewerContainer
+  }
+
+  get isContainerRtl() {
+    return getComputedStyle(this.container).direction === 'rtl'
+  }
+
+  get containerTopLeft() {
+    return this._containerTopLeft ||= [this.container.offsetTop, this.container.offsetLeft]
+  }
 
   init() {
     this._container = this.options.container ?? createElement('div')
@@ -22,32 +42,24 @@ export class ContainerManager extends Manager {
       { once: true },
     )
 
-    this.on('firstpageloaded', ({ viewport }) => {
+    this.on('documentopen', () => this.rootContainer.classList.add('loading'))
+    this.on(['documentloaded', 'documenterror', 'documentempty'], () => this.rootContainer.classList.remove('loading'))
+
+    this.on('firstpageloaded', ({ pdfDocument, viewport }) => {
       this.setScaleFactor(viewport.scale)
+      applyHighlightHCMFilter(this.container, this.viewer.pageColors, pdfDocument.filterFactory)
     })
 
-    this.on('documentinit', () => {
-      this.focus()
-
-      this.pdfDocument?.getMetadata().then(({ info }) => {
-        if ('Language' in info) {
-          this.viewerContainer.lang = String(info.Language)
-        }
-      })
+    this.on('metadataloaded', ({ info }) => {
+      if ('Language' in info && info.Language) {
+        this.viewerContainer.lang = String(info.Language)
+      }
     })
   }
 
   reset() {
     this.viewerContainer.textContent = ''
     this.viewerContainer.removeAttribute('lang')
-  }
-
-  getContainer() {
-    return this._container
-  }
-
-  getViewerContainer() {
-    return this._viewerContainer
   }
 
   containsElement(element: Node | null) {
@@ -62,14 +74,6 @@ export class ContainerManager extends Manager {
     this.viewerContainer.style.setProperty('--scale-factor', scale.toString())
   }
 
-  get isContainerRtl() {
-    return getComputedStyle(this.container).direction === 'rtl'
-  }
-
-  getContainerTopLeft() {
-    return this.containerTopLeft ||= [this.container.offsetTop, this.container.offsetLeft]
-  }
-
   private updateContainerHeightCss(height = this.container.clientHeight) {
     if (height !== this.previousContainerHeight) {
       this.previousContainerHeight = height
@@ -81,7 +85,7 @@ export class ContainerManager extends Manager {
     for (const entry of entries) {
       if (entry.target === this.container) {
         this.updateContainerHeightCss(Math.floor(entry.borderBoxSize[0].blockSize))
-        this.containerTopLeft = undefined
+        this._containerTopLeft = undefined
         break
       }
     }

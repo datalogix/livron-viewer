@@ -47,6 +47,30 @@ export function getVisibleElements(
     return rtl ? elementLeft < right : elementRight > left
   }
 
+  function backtrackBeforeAllVisibleElements(index: number, views: VisibleView[], top: number) {
+    if (index < 2) return index
+
+    let elt = views[index].div
+    let pageTop = elt.offsetTop + elt.clientTop
+
+    if (pageTop >= top) {
+      elt = views[index - 1].div
+      pageTop = elt.offsetTop + elt.clientTop
+    }
+
+    for (let i = index - 2; i >= 0; --i) {
+      elt = views[i].div
+
+      if (elt.offsetTop + elt.clientTop + elt.clientHeight <= pageTop) {
+        break
+      }
+
+      index = i
+    }
+
+    return index
+  }
+
   const visible = []
   const ids = new Set<number>()
   const numViews = views.length
@@ -130,26 +154,28 @@ export function getVisibleElements(
   return { first, last, views: visible, ids }
 }
 
-function backtrackBeforeAllVisibleElements(index: number, views: VisibleView[], top: number) {
-  if (index < 2) return index
-
-  let elt = views[index].div
-  let pageTop = elt.offsetTop + elt.clientTop
-
-  if (pageTop >= top) {
-    elt = views[index - 1].div
-    pageTop = elt.offsetTop + elt.clientTop
+export async function onePageRenderedOrForceFetch(
+  container: HTMLElement,
+  visibleElements: VisibleElements,
+  onePageRenderedCapability: Promise<{ timestamp: number }>,
+  signal: AbortSignal,
+) {
+  if (document.visibilityState === 'hidden'
+    || !container.offsetParent
+    || visibleElements.views.length === 0
+  ) {
+    return
   }
 
-  for (let i = index - 2; i >= 0; --i) {
-    elt = views[i].div
+  const hiddenCapability = Promise.withResolvers<void>()
 
-    if (elt.offsetTop + elt.clientTop + elt.clientHeight <= pageTop) {
-      break
+  function onVisibilityChange() {
+    if (document.visibilityState === 'hidden') {
+      hiddenCapability.resolve()
     }
-
-    index = i
   }
 
-  return index
+  document.addEventListener('visibilitychange', onVisibilityChange, { signal })
+  await Promise.race([onePageRenderedCapability, hiddenCapability.promise])
+  document.removeEventListener('visibilitychange', onVisibilityChange)
 }

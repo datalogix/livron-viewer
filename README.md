@@ -1,5 +1,25 @@
-- Revisar print, pdfscriptmanager, downlodmanager, l10n, keyboardmanager, find
-- Revisar styles/\*.css
+- Revisar o estilos
+- keyboardmanager - (manipular pelo teclado)
+- History - Carregar as preferencias através do hash da url
+- Bookmarks - Estão sendo salvos apenas no navegador (localStorage)
+- Interações - Atualizar em tempo real
+- Time - Medir o tempo de utilização por pdf (livro)
+- Marca d'água - Implementar marca d'água nas páginas ou usar ou pdf?
+
+- Rastreador de progresso (Progress tracker)
+
+  - Quantidade de páginas visualizadas vs quantidade de páginas
+  - Quantidade de interações clicadas vs quantidade de interações
+  - Quantidade de atividades feitas vs quantidade de atividades
+  - Média do resultado das atividades
+  - Tempo de utilização
+
+- Anotações - Salvar anotações
+- Anotações - Criar círculo
+- Anotações - Criar quadrado
+- Anotações - Criar borracha
+- Anotações - Criar seletor
+- Anotações - Revisar funcionamento (Criar um plugin para isso?)
 
 # Livron - Viewer
 
@@ -28,7 +48,6 @@
 - [ ] Informações do livro
 - [ ] Bookmarks - Criar, exibir suas marcações e carregar a ultima página visualizada
 - [ ] Marca-texto - No caso de arquivos PDF
-
 - [ ] Pesquisar texto - No caso de arquivos PDF
 - [ ] Anotação
   - Escrever com cores e tamanho

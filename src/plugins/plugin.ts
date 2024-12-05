@@ -2,6 +2,10 @@ import { Dispatcher } from '@/bus'
 import type { ViewerType } from '@/viewer'
 import type { Toolbar, ToolbarItemType } from '@/toolbar'
 
+export {
+  ToolbarItemType,
+}
+
 export type PluginType = (Plugin | (new () => Plugin))
 
 export abstract class Plugin extends Dispatcher {
@@ -10,7 +14,7 @@ export abstract class Plugin extends Dispatcher {
   protected abortController?: AbortController
 
   get name() {
-    return this.constructor.name.toLowerCase()
+    return this.constructor.name.toLowerCase().replace('plugin', '')
   }
 
   get toolbar() {
@@ -33,28 +37,48 @@ export abstract class Plugin extends Dispatcher {
     return this.abortController?.signal
   }
 
+  get l10n() {
+    return this.viewer.l10n
+  }
+
+  get logger() {
+    return this.viewer.logger
+  }
+
   get pdfDocument() {
     return this.viewer.getDocument()
   }
 
+  get rootContainer() {
+    return this.viewer.rootContainer
+  }
+
   get container() {
-    return this.viewer.getContainer()
+    return this.viewer.container
   }
 
   get viewerContainer() {
-    return this.viewer.getViewerContainer()
+    return this.viewer.viewerContainer
   }
 
   get pagesCount() {
-    return this.viewer.pagesManager.pagesCount
+    return this.viewer.pagesCount
   }
 
   get page() {
-    return this.viewer.pagesManager.currentPageNumber
+    return this.viewer.currentPageNumber
   }
 
   set page(val: number) {
-    this.viewer.pagesManager.currentPageNumber = val
+    this.viewer.currentPageNumber = val
+  }
+
+  setCurrentPage(page: number) {
+    this.page = page
+  }
+
+  get initialized() {
+    return this.viewer.initialized
   }
 
   setToolbar(toolbar: Toolbar) {

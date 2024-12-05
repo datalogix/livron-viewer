@@ -53,3 +53,11 @@ export function normalizeWheelEventDelta(event: WheelEvent) {
 
   return delta
 }
+
+export function dispatchEvent(name: string, target: EventTarget = window) {
+  target.dispatchEvent(new CustomEvent(name, {
+    bubbles: false,
+    cancelable: false,
+    detail: 'custom',
+  }))
+}

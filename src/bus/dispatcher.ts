@@ -7,11 +7,14 @@ export abstract class Dispatcher {
     return undefined
   }
 
-  on(name: string, listener: ListenerCallback, options?: ListenerOptions) {
-    this.eventBus.on(name, listener, {
-      signal: this.signal,
-      ...options,
-    })
+  on(name: string | string[], listener: ListenerCallback, options?: ListenerOptions) {
+    const names = Array.isArray(name) ? name : [name]
+    for (const key of names) {
+      this.eventBus.on(key, listener, {
+        signal: this.signal,
+        ...options,
+      })
+    }
   }
 
   off(name: string, listener?: ListenerCallback) {

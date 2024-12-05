@@ -2,18 +2,37 @@
   @apply i-ph:info;
 }
 
+.information-modal {
+  @apply max-w-2xl;
+
+  .modal-content {
+    @apply overflow-auto max-h-140;
+  }
+}
+
 .information {
   @apply divide-y gap-6;
 
-  li {
-    @apply p-4;
+  .item {
+    @apply
+      space-y-2
+      p-4
+    ;
 
-    .title {
-      @apply block font-semibold mb-1;
-    }
+    .header {
+      @apply
+        flex
+        justify-between
+        flex-wrap
+      ;
 
-    .description {
-      @apply block text-sm;
+      .name {
+        @apply font-semibold shrink-0;
+      }
+
+      .value {
+        @apply text-sm whitespace-pre-line;
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
-import { Dispatcher, type EventBus } from '@/bus'
+import { Dispatcher } from '@/bus'
 import type { PDFDocumentProxy } from '@/pdfjs'
 import { getVisibleElements, scrollIntoView, watchScroll, type VisibleElements } from '@/utils'
-import { isValidRotation, Renderable, type RenderingQueue } from '@/viewer'
+import { isValidRotation, Renderable, ViewerType } from '@/viewer'
 import { destroyTempCanvas } from './helpers'
 import { Thumbnail } from './thumbnail'
 
@@ -12,39 +12,37 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
   private pdfDocument?: PDFDocumentProxy
   private thumbnails: Thumbnail[] = []
   private _pageLabels?: string[]
-  private _pagesRotation
+  private _rotation
   private currentPageNumber = 1
   private scroll
 
-  constructor(readonly options: {
-    container: HTMLDivElement
-    eventBus: EventBus
-    renderingQueue?: RenderingQueue
-    abortSignal?: AbortSignal
-    enableHWA?: boolean
-    pagesRotation?: number
-  }) {
+  constructor(
+    protected readonly container: HTMLDivElement,
+    protected readonly viewer: ViewerType,
+    protected readonly abortSignal?: AbortSignal,
+  ) {
     super()
 
     this.scroll = watchScroll(
-      this.options.container,
+      this.container,
       this.forceRendering.bind(this),
-      this.signal,
+      abortSignal,
     )
 
     this.reset()
-    this._pagesRotation = options.pagesRotation ?? 0
-
-    this.on('rotationchanging', ({ pagesRotation }) => this.pagesRotation = pagesRotation)
-    this.on('rendercleanup', () => this.cleanup())
+    this._rotation = viewer.rotation ?? 0
   }
 
   get eventBus() {
-    return this.options.eventBus
+    return this.viewer.eventBus
   }
 
   get signal() {
-    return this.options.abortSignal
+    return this.abortSignal
+  }
+
+  get logger() {
+    return this.viewer.logger
   }
 
   getThumbnail(index: number) {
@@ -52,7 +50,7 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
   }
 
   private getVisibleThumbs() {
-    return getVisibleElements(this.options.container, this.thumbnails)
+    return getVisibleElements(this.container, this.thumbnails)
   }
 
   scrollIntoView(pageNumber: number) {
@@ -63,21 +61,18 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
     const thumbnail = this.thumbnails[pageNumber - 1]
 
     if (!thumbnail) {
-      console.error('scrollIntoView: Invalid "pageNumber" parameter.')
+      this.logger.error('scrollIntoView: Invalid "pageNumber" parameter.')
       return
     }
 
     if (pageNumber !== this.currentPageNumber) {
       const prevThumbnail = this.thumbnails[this.currentPageNumber - 1]
-      // Remove the highlight from the previous thumbnail...
       prevThumbnail.div.classList.remove(THUMBNAIL_SELECTED_CLASS)
-      // ... and add the highlight to the new thumbnail.
       thumbnail.div.classList.add(THUMBNAIL_SELECTED_CLASS)
     }
 
     const { first, last, views } = this.getVisibleThumbs()
 
-    // If the thumbnail isn't currently visible, scroll it into view.
     if (views.length > 0) {
       let shouldScroll = false
 
@@ -102,24 +97,24 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
     this.forceRendering()
   }
 
-  get pagesRotation() {
-    return this._pagesRotation
+  get rotation() {
+    return this._rotation
   }
 
-  set pagesRotation(rotation) {
+  set rotation(rotation) {
     if (!isValidRotation(rotation)) {
-      throw new Error('Invalid thumbnails rotation angle.')
+      throw new Error('Invalid thumbnails rotation.')
     }
 
     if (!this.pdfDocument) {
       return
     }
 
-    if (this._pagesRotation === rotation) {
-      return // The rotation didn't change.
+    if (this._rotation === rotation) {
+      return
     }
 
-    this._pagesRotation = rotation
+    this._rotation = rotation
 
     for (const thumbnail of this.thumbnails) {
       thumbnail.update({ rotation })
@@ -154,8 +149,8 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
     this.thumbnails = []
     this.currentPageNumber = 1
     this.pageLabels = undefined
-    this._pagesRotation = 0
-    this.options.container.textContent = ''
+    this._rotation = 0
+    this.container.textContent = ''
   }
 
   setDocument(pdfDocument?: PDFDocumentProxy) {
@@ -179,27 +174,36 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
 
         for (let pageNum = 1; pageNum <= pagesCount; ++pageNum) {
           const thumbnail = new Thumbnail({
-            ...this.options,
+            container: this.container,
+            eventBus: this.eventBus,
+            l10n: this.viewer.l10n,
+            layerProperties: this.viewer.layerPropertiesManager,
             id: pageNum,
             viewport: viewport.clone(),
-            rotation: this.pagesRotation,
+            rotation: this.rotation,
+            renderingQueue: this.viewer.renderingQueue,
             optionalContentConfigPromise,
+            enableHWA: this.viewer.options.enableHWA,
+            pageColors: this.viewer.pageColors,
           })
 
           this.thumbnails.push(thumbnail)
         }
 
-        // Set the first `pdfPage` immediately, since it's already loaded,
-        // rather than having to repeat the `PDFDocumentProxy.getPage` call in
-        // the `this.ensurePdfPageLoaded` method before rendering can start.
+        if (this.viewer.pageLabels) {
+          this.pageLabels = this.viewer.pageLabels
+        }
+
         this.thumbnails[0]?.setPdfPage(firstPdfPage)
 
-        // Ensure that the current thumbnail is always highlighted on load.
         const thumbnail = this.thumbnails[this.currentPageNumber - 1]
         thumbnail.div.classList.add(THUMBNAIL_SELECTED_CLASS)
       })
       .catch((reason) => {
-        console.error('Unable to initialize thumbnail viewer', reason)
+        this.logger.error('Unable to initialize thumbnail viewer', reason)
+      })
+      .finally(() => {
+        queueMicrotask(() => this.scrollIntoView(this.viewer.currentPageNumber))
       })
   }
 
@@ -216,7 +220,7 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
       this._pageLabels = undefined
     } else if (!(Array.isArray(labels) && this.pdfDocument.numPages === labels.length)) {
       this._pageLabels = undefined
-      console.error('PDFThumbnailViewer_setPageLabels: Invalid page labels.')
+      this.logger.error('PDFThumbnailViewer_setPageLabels: Invalid page labels.')
     } else {
       this._pageLabels = labels
     }
@@ -244,8 +248,7 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
 
       return pdfPage
     } catch (reason) {
-      console.error('Unable to get page for thumbnail view', reason)
-      return null // Page error -- there is nothing that can be done.
+      this.logger.error('Unable to get page for thumbnail view', reason)
     }
   }
 
@@ -262,16 +265,16 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
   forceRendering() {
     const visibleThumbs = this.getVisibleThumbs()
     const scrollAhead = this.getScrollAhead(visibleThumbs)
-    const thumbnail = this.options.renderingQueue?.getHighestPriority(
+    const thumbnail = this.viewer.renderingQueue?.getHighestPriority(
       visibleThumbs,
       this.thumbnails,
       scrollAhead,
     )
 
     if (thumbnail) {
-      this.ensurePdfPageLoaded(thumbnail as Thumbnail).then(() => {
-        this.options.renderingQueue?.renderView(thumbnail)
-      })
+      this.ensurePdfPageLoaded(thumbnail as Thumbnail)
+        .then(() => this.viewer.renderingQueue?.renderView(thumbnail))
+        .catch(reason => this.logger.error(this.viewer.l10n.get('error.rendering'), reason))
 
       return true
     }

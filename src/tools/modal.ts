@@ -5,19 +5,21 @@ export class Modal {
   private static container?: HTMLDivElement
   private static onClose?: () => void
 
-  static open(content: HTMLElement, options?: {
+  static open(html: HTMLElement, options?: {
     title?: string
     draggable?: boolean
     persist?: boolean
-    backdrop?: 'blur' | 'overlay'
+    backdrop?: 'blur' | 'overlay' | boolean
     onClose?: () => void
+    root?: HTMLElement
   }) {
     this.close()
     options = options || {}
     this.onClose = options.onClose
 
     const container = createElement('div', 'modal-container')
-    document.body.appendChild(container)
+    const root = options.root || document.body
+    root.appendChild(container)
 
     let header = undefined
 
@@ -27,7 +29,7 @@ export class Modal {
     }
 
     if (!options.persist) {
-      const button = createElement('button', 'modal-close')
+      const button = createElement('button', 'modal-close', { type: 'button' })
       button.addEventListener('click', () => this.close())
       container.appendChild(button)
     }
@@ -37,7 +39,7 @@ export class Modal {
     }
 
     if (options.backdrop) {
-      this.backdrop = createElement('div', ['modal-backdrop', `modal-backdrop-${options.backdrop}`])
+      this.backdrop = createElement('div', ['modal-backdrop', `modal-backdrop-${options.backdrop === true ? 'overlay' : options.backdrop}`])
 
       this.backdrop?.addEventListener('click', () => {
         if (!options.persist) {
@@ -50,12 +52,12 @@ export class Modal {
         setTimeout(() => container.classList.remove('modal-persist'), 300)
       })
 
-      container.parentElement?.appendChild(this.backdrop)
+      root.appendChild(this.backdrop)
     }
 
-    const body = createElement('div', 'modal-content')
-    body.appendChild(content)
-    container.appendChild(body)
+    const content = createElement('div', 'modal-content')
+    content.appendChild(html)
+    container.appendChild(content)
 
     return this.container = container
   }

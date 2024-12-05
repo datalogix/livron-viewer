@@ -7,7 +7,7 @@ export type Location = {
   top: number
   left: number
   rotation: number
-  pdfOpenParams: string
+  openParams: string
 }
 
 export class LocationManager extends Manager {
@@ -17,15 +17,21 @@ export class LocationManager extends Manager {
     return this._location
   }
 
+  get baseUrl() {
+    return location.href.split('#', 1)[0]
+  }
+
   reset() {
     this._location = undefined
   }
 
   update(visible: VisibleElements) {
-    this.updateLocation(visible.first!)
+    if (!visible.first) return
+
+    this.updateLocation(visible.first)
   }
 
-  updateLocation(firstPage: VisibleElement) {
+  private updateLocation(firstPage: VisibleElement) {
     const currentScale = this.currentScale
     const currentScaleValue = this.currentScaleValue
     const normalizedScaleValue = parseFloat(String(currentScaleValue)) === currentScale
@@ -37,10 +43,10 @@ export class LocationManager extends Manager {
     const topLeft = currentPage.getPagePoint(container.scrollLeft - firstPage.x, container.scrollTop - firstPage.y)
     const intLeft = Math.round(topLeft[0])
     const intTop = Math.round(topLeft[1])
-    let pdfOpenParams = `#page=${pageNumber}`
+    let openParams = `#page=${pageNumber}`
 
     if (!this.isInPresentationMode) {
-      pdfOpenParams += `&zoom=${normalizedScaleValue},${intLeft},${intTop}`
+      openParams += `&scale=${normalizedScaleValue},${intLeft},${intTop}`
     }
 
     this._location = {
@@ -48,10 +54,14 @@ export class LocationManager extends Manager {
       scale: normalizedScaleValue,
       top: intTop,
       left: intLeft,
-      rotation: this.rotationManager.pagesRotation,
-      pdfOpenParams,
+      rotation: this.rotation,
+      openParams,
     }
 
-    this.dispatch('updateviewarea', { location: this.location })
+    this.dispatch('updateviewarea', { location: this._location })
+  }
+
+  getAnchorUrl(anchor = this._location?.openParams) {
+    return `${this.baseUrl}${anchor ?? ''}`
   }
 }

@@ -91,6 +91,8 @@ export class ScaleManager extends Manager {
           scale: newScale,
           presetValue: newValue,
         })
+
+        this.viewer.update()
       }
 
       return
@@ -133,7 +135,7 @@ export class ScaleManager extends Manager {
 
       if (Array.isArray(options?.origin)) {
         const scaleDiff = newScale / previousScale - 1
-        const [top, left] = this.containerManager.getContainerTopLeft()
+        const [top, left] = this.containerManager.containerTopLeft
         this.container.scrollLeft += (options.origin[0] - left) * scaleDiff
         this.container.scrollTop += (options.origin[1] - top) * scaleDiff
       }
@@ -205,7 +207,7 @@ export class ScaleManager extends Manager {
         break
       }
       default:
-        console.error(`setScale: '${value}' is an unknown zoom value.`)
+        this.logger.error(`setScale: '${value}' is an unknown zoom value.`)
         return
     }
 

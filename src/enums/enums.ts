@@ -33,3 +33,12 @@ export enum RenderingStates {
   PAUSED = 2,
   FINISHED = 3,
 }
+
+export enum SidebarTypes {
+  THUMBNAIL = 'thumbnail',
+  OUTLINE = 'outline',
+  ATTACHMENT = 'attachment',
+  LAYER = 'layer',
+}
+
+export type SidebarType = string | SidebarTypes

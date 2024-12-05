@@ -1,4 +1,4 @@
-import type { StructTreeContent, StructTreeNode } from '@/pdfjs'
+import type { StructTreeNode, StructTreeContent } from '@/pdfjs'
 import { createElement, removeNullCharacters } from '@/utils'
 import { LayerBuilder } from './layer-builder'
 import { TextLayerBuilder } from './text-layer-builder'

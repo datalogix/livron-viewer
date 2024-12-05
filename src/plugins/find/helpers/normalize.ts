@@ -117,7 +117,7 @@ export function normalize(text: string) {
     i -= shiftOrigin
     if (p1) {
       // Maybe fractions or quotations mark...
-      const replacement = (CHARACTERS_TO_NORMALIZE as any)[p1] as string
+      const replacement = CHARACTERS_TO_NORMALIZE[p1 as keyof typeof CHARACTERS_TO_NORMALIZE]
       const jj = replacement.length
       for (let j = 1; j < jj; j++) {
         positions.push([i - shift + j, shift - j])

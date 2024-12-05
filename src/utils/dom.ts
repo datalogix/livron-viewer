@@ -2,6 +2,10 @@ export function preventDefault() {
   return (event: MouseEvent) => event.preventDefault()
 }
 
+export function isEmbedded() {
+  return window.parent !== window
+}
+
 export function createElement<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   classesOrAttributes?: string | string[] | Record<string, any>,
@@ -38,13 +42,13 @@ export function dragElement(element: HTMLElement, handler?: HTMLElement) {
     if (event instanceof TouchEvent) {
       offsetX = event.touches[0].clientX - element.offsetLeft
       offsetY = event.touches[0].clientY - element.offsetTop
-      element.ownerDocument.addEventListener('touchmove', onDrag)
-      element.ownerDocument.addEventListener('touchend', stopDrag)
+      element.ownerDocument.addEventListener('touchmove', onDrag, { passive: true })
+      element.ownerDocument.addEventListener('touchend', stopDrag, { passive: true })
     } else {
       offsetX = event.clientX - element.offsetLeft
       offsetY = event.clientY - element.offsetTop
-      element.ownerDocument.addEventListener('mousemove', onDrag)
-      element.ownerDocument.addEventListener('mouseup', stopDrag)
+      element.ownerDocument.addEventListener('mousemove', onDrag, { passive: true })
+      element.ownerDocument.addEventListener('mouseup', stopDrag, { passive: true })
     }
   }
 
@@ -68,8 +72,9 @@ export function dragElement(element: HTMLElement, handler?: HTMLElement) {
     }
   }
 
-  handler.addEventListener('mousedown', startDrag)
-  handler.addEventListener('touchstart', startDrag)
+  handler.addEventListener('mousedown', startDrag, { passive: true })
+  handler.addEventListener('touchstart', startDrag, { passive: true })
   handler.style.cursor = 'move'
+  handler.style.userSelect = 'none'
   handler.oncontextmenu = preventDefault()
 }

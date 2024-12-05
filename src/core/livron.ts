@@ -1,3 +1,4 @@
+import { Dispatcher, EventBus } from '@/bus'
 import type { PluginType } from '@/plugins'
 import { Toolbar, ToolbarOptions, type ToolbarItemType } from '@/toolbar'
 import { Viewer, type ViewerType, type ViewerOptions } from '@/viewer'
@@ -9,9 +10,13 @@ export type LivronOptions = {
   viewerOptions?: ViewerOptions
 }
 
-export class Livron {
+export class Livron extends Dispatcher {
   protected plugins: PluginType[] = DEFAULT_PLUGINS
   protected toolbarItems: Map<string, ToolbarItemType> = DEFAULT_TOOLBAR_ITEMS
+
+  constructor(readonly eventBus: EventBus = new EventBus()) {
+    super()
+  }
 
   addPlugin(plugin: PluginType) {
     this.plugins.push(plugin)
@@ -74,11 +79,16 @@ export class Livron {
 
     container.tabIndex = 0
 
-    const viewer = new Viewer(options.viewerOptions) as ViewerType
+    const viewer = new Viewer({
+      eventBus: this.eventBus,
+      ...options.viewerOptions,
+    }) as ViewerType
+
     const toolbar = new Toolbar(viewer, options.toolbarOptions)
 
     container.appendChild(toolbar.render())
     container.appendChild(viewer.render())
+    container.dir = viewer.l10n.getDirection()
 
     await this.initializePlugins(toolbar, viewer)
     await this.initializeToolbar(toolbar)

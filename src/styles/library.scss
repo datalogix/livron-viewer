@@ -9,7 +9,7 @@
     }
 
     .book {
-      @apply flex cursor-pointer items-center shadow border border-gray-100 rounded hover:scale-105 transition overflow-hidden p-6 gap-6;
+      @apply flex cursor-pointer items-center shadow border border-gray-100 rounded hover:scale-105 transition overflow-hidden p-6 gap-10;
 
       > i {
         @apply i-ph:book w-32 h-40 text-gray-500 shrink-0;
@@ -20,7 +20,7 @@
       }
 
       .info {
-        @apply flex-1 flex flex-col gap-4;
+        @apply flex-1 flex flex-col gap-4 text-left;
 
         h2 {
           @apply text-lg font-semibold text-gray-700;
@@ -33,6 +33,10 @@
             b {
               @apply font-medium;
             }
+          }
+
+          .description {
+            @apply whitespace-pre-line;
           }
         }
       }

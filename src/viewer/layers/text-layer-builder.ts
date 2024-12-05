@@ -1,10 +1,12 @@
 import { TextLayerMode } from '@/enums'
 import { AbortException, TextLayer, normalizeUnicode } from '@/pdfjs'
 import { createElement, removeNullCharacters } from '@/utils'
+import { TextAccessibilityManager } from './text-accessibility-manager'
 import { LayerBuilder } from './layer-builder'
 
 export class TextLayerBuilder extends LayerBuilder {
   div: HTMLDivElement = createElement('div', 'textLayer', { tabIndex: 0 })
+  readonly textAccessibilityManager = new TextAccessibilityManager()
 
   private renderingDone = false
   private _textLayer?: TextLayer
@@ -66,6 +68,9 @@ export class TextLayerBuilder extends LayerBuilder {
     this.layersPage.add(this.div, 1)
 
     this.dispatch('render')
+
+    this.textAccessibilityManager.setTextMapping(this._textLayer.textDivs)
+    queueMicrotask(() => this.textAccessibilityManager.enable())
   }
 
   hide() {
@@ -87,6 +92,7 @@ export class TextLayerBuilder extends LayerBuilder {
     this._textLayer = undefined
 
     TextLayerBuilder.removeGlobalSelectionListener(this.div)
+    this.textAccessibilityManager.disable()
   }
 
   private bindMouse(end: HTMLElement) {

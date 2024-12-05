@@ -7,19 +7,30 @@ export abstract class ToolbarAction extends ToolbarItem {
 
   protected abstract execute(): Promise<void> | void
 
-  async initialize(enabled?: boolean) {
+  async initialize() {
     if (this.initialized) return
 
     this.button = createElement('button', {
       type: 'button',
-      innerHTML: `<span>${this.constructor.name.toLowerCase()}</span>`,
+      innerHTML: `<span>${this.l10n.get(`toolbar.${this.name}.label`)}</span>`,
+      title: this.l10n.get(`toolbar.${this.name}.title`),
     })
 
     this.container.classList.add('toolbar-action')
     this.container.appendChild(this.button)
     this.disable()
 
-    await super.initialize(enabled)
+    await super.initialize()
+
+    this.on('pagesinit', () => {
+      this.toggle()
+      this.markAsActivated()
+    })
+
+    this.on('pagesdestroy', () => {
+      this.toggle(false)
+      this.markAsActivated(false)
+    })
   }
 
   async terminate() {
@@ -31,11 +42,6 @@ export abstract class ToolbarAction extends ToolbarItem {
     this.button = undefined
 
     await super.terminate()
-  }
-
-  protected onInit(enabled?: boolean): Promise<void> | void {
-    this.toggle(enabled)
-    this.markAsActivated()
   }
 
   get enabled() {

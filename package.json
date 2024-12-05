@@ -32,25 +32,26 @@
     "test": "pnpm lint"
   },
   "dependencies": {
-    "@unocss/reset": "^0.64.0",
+    "@unocss/reset": "^0.64.1",
+    "i18next": "^24.0.2",
+    "i18next-browser-languagedetector": "^8.0.0",
     "ofetch": "^1.4.1",
-    "pdfjs-dist": "^4.6.82",
-    "unpdf": "^0.12.1"
+    "pdfjs-dist": "^4.6.82"
   },
   "devDependencies": {
-    "@eslint/js": "^9.14.0",
-    "@iconify/json": "^2.2.268",
-    "@stylistic/eslint-plugin": "^2.10.1",
-    "@types/node": "^22.9.0",
+    "@eslint/js": "^9.15.0",
+    "@iconify/json": "^2.2.277",
+    "@stylistic/eslint-plugin": "^2.11.0",
+    "@types/node": "^22.10.1",
     "changelogen": "^0.5.7",
-    "eslint": "^9.14.0",
+    "eslint": "^9.15.0",
     "globals": "^15.12.0",
-    "sass": "^1.80.6",
-    "typescript": "^5.6.3",
-    "typescript-eslint": "^8.13.0",
-    "unocss": "^0.64.0",
-    "vite": "^5.4.10",
-    "vite-plugin-eslint2": "^5.0.1"
+    "sass": "^1.81.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.16.0",
+    "unocss": "^0.64.1",
+    "vite": "^5.4.11",
+    "vite-plugin-eslint2": "^5.0.3"
   },
-  "packageManager": "pnpm@9.12.3"
+  "packageManager": "pnpm@9.14.2"
 }

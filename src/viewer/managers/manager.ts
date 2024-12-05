@@ -8,19 +8,23 @@ export abstract class Manager extends Dispatcher {
   }
 
   init() {
-    //
+
   }
 
   reset() {
-    //
+
   }
 
   refresh(_params: PageUpdate) {
-    //
+
   }
 
   update(_visible: VisibleElements) {
-    //
+
+  }
+
+  get canExpose() {
+    return true
   }
 
   get options() {
@@ -35,6 +39,10 @@ export abstract class Manager extends Dispatcher {
     return this.options.abortSignal
   }
 
+  get l10n() {
+    return this.viewer.l10n
+  }
+
   get annotationManager() {
     return this.viewer.annotationManager
   }
@@ -47,12 +55,24 @@ export abstract class Manager extends Dispatcher {
     return this.viewer.documentManager
   }
 
+  get documentPropertiesManager() {
+    return this.viewer.documentPropertiesManager
+  }
+
+  get initializerManager() {
+    return this.viewer.initializerManager
+  }
+
   get layerBuildersManager() {
     return this.viewer.layerBuildersManager
   }
 
   get locationManager() {
     return this.viewer.locationManager
+  }
+
+  get logger() {
+    return this.viewer.logger
   }
 
   get optionalContentManager() {
@@ -95,12 +115,16 @@ export abstract class Manager extends Dispatcher {
     return this.documentManager.getDocument()
   }
 
+  get rootContainer() {
+    return this.containerManager.rootContainer
+  }
+
   get container() {
-    return this.containerManager.getContainer()
+    return this.containerManager.container
   }
 
   get viewerContainer() {
-    return this.containerManager.getViewerContainer()
+    return this.containerManager.viewerContainer
   }
 
   get pagesCount() {
@@ -131,8 +155,8 @@ export abstract class Manager extends Dispatcher {
     return this.spreadManager.spreadMode
   }
 
-  get pagesRotation() {
-    return this.rotationManager.pagesRotation
+  get rotation() {
+    return this.rotationManager.rotation
   }
 
   get renderingQueue() {

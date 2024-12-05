@@ -25,3 +25,32 @@
 @use 'information';
 @use 'find';
 @use 'library';
+
+
+.toolbar-item-currentpage > button:before {
+  @apply i-ph:eye;
+}
+
+.toolbar-item-download > button:before {
+  @apply i-ph:download;
+}
+
+.toolbar-item-open > button:before {
+  @apply i-ph:folder-open;
+}
+
+.toolbar-item-print > button:before {
+  @apply i-ph:printer;
+}
+
+.toolbar-item-annotationink > button:before {
+  @apply i-ph:pen-thin;
+}
+
+.toolbar-item-annotationfreetext > button:before {
+  @apply i-ph:text;
+}
+
+.toolbar-item-annotationhighlight > button:before {
+  @apply i-material-symbols:format-ink-highlighter-outline
+}

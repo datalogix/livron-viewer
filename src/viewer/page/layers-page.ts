@@ -4,7 +4,7 @@ import { LayerBuilder, type LayerBuilderType } from '../layers'
 import type { Page, PageUpdate } from './'
 
 export class LayersPage extends Dispatcher {
-  private layers: (Element | null)[] = []
+  private layers = new Map<number, (Element | null)>()
   private builders: LayerBuilder[] = []
 
   constructor(
@@ -49,11 +49,13 @@ export class LayersPage extends Dispatcher {
         this.builders.push(item)
       }
     }
+
+    this.builders = this.builders.sort((a, b) => b.priority - a.priority)
   }
 
   async render(postpone?: boolean) {
     for (const builder of this.builders) {
-      const key = builder.constructor.name.toLowerCase().replace('Builder', '')
+      const key = builder.name.replace('builder', '')
       let error = null
 
       try {
@@ -63,7 +65,6 @@ export class LayersPage extends Dispatcher {
           continue
         }
 
-        console.error(`${key}: '${ex}'.`)
         error = ex
       } finally {
         this.dispatch(`${key.toLowerCase()}rendered`, { error })
@@ -81,10 +82,10 @@ export class LayersPage extends Dispatcher {
 
       node.remove()
 
-      const index = this.layers.indexOf(node as Element)
+      const index = [...this.layers].find(([, value]) => node === value)?.[0]
 
-      if (index >= 0) {
-        this.layers[index] = null
+      if (index !== undefined) {
+        this.layers.set(index, null)
       }
     }
 
@@ -119,7 +120,7 @@ export class LayersPage extends Dispatcher {
       }
 
       return true
-    })
+    }).sort((a, b) => b.priority - a.priority)
   }
 
   finish(renderTask: RenderTask) {
@@ -127,9 +128,9 @@ export class LayersPage extends Dispatcher {
   }
 
   add(div: HTMLElement, position: number) {
-    const oldDiv = this.layers[position]
+    const oldDiv = this.layers.get(position)
 
-    this.layers[position] = div
+    this.layers.set(position, div)
 
     if (oldDiv) {
       oldDiv.replaceWith(div)
@@ -137,7 +138,7 @@ export class LayersPage extends Dispatcher {
     }
 
     for (let i = position - 1; i >= 0; i--) {
-      const layer = this.layers[i]
+      const layer = this.layers.get(i)
 
       if (layer) {
         layer.after(div)

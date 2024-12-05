@@ -14,7 +14,7 @@ export class OptionalContentManager extends Manager {
     }
 
     if (!this._optionalContentConfig) {
-      console.error('optionalContentConfigPromise: Not initialized yet.')
+      this.logger.error('optionalContentConfigPromise: Not initialized yet.')
 
       this._optionalContentConfig = this.pdfDocument.getOptionalContentConfig({ intent: 'display' })
     }

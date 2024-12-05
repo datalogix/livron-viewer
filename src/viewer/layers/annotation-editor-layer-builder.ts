@@ -1,12 +1,11 @@
-import { AnnotationEditorLayer, IL10n, type AnnotationEditorLayerOptions } from '@/pdfjs'
-import { TextAccessibilityLayerBuilder } from '@/plugins'
+import { AnnotationEditorLayer, DrawLayer, type AnnotationEditorLayerOptions } from '@/pdfjs'
 import { AnnotationLayerBuilder } from './annotation-layer-builder'
-import { DrawLayerBuilder } from './draw-layer-builder'
 import { LayerBuilder } from './layer-builder'
 import { TextLayerBuilder } from './text-layer-builder'
 
 export class AnnotationEditorLayerBuilder extends LayerBuilder {
   private _annotationEditorLayer?: AnnotationEditorLayer
+  private _drawLayer?: DrawLayer
 
   get annotationEditorLayer() {
     return this._annotationEditorLayer
@@ -25,6 +24,9 @@ export class AnnotationEditorLayerBuilder extends LayerBuilder {
       return
     }
 
+    this._drawLayer ||= new DrawLayer({ pageIndex: this.id })
+    this._drawLayer.setParent(this.canvasPage.canvasWrapper)
+
     const clonedViewport = this.viewport.clone({ dontFlip: true })
 
     if (this.div) {
@@ -34,21 +36,20 @@ export class AnnotationEditorLayerBuilder extends LayerBuilder {
       return
     }
 
-    this.create('annotationEditorLayer', 3)
+    const div = this.create('annotationEditorLayer', 3)
     this.hide()
-    this.div!.dir = this.annotationEditorUIManager?.direction
+    div.dir = this.annotationEditorUIManager?.direction
 
     this._annotationEditorLayer = new AnnotationEditorLayer({
-      div: this.div!,
+      div,
       uiManager: this.annotationEditorUIManager,
-      accessibilityManager: this.findLayer<TextAccessibilityLayerBuilder>(TextAccessibilityLayerBuilder)?.textAccessibilityManager as any,
+      accessibilityManager: this.findLayer<TextLayerBuilder>(TextLayerBuilder)?.textAccessibilityManager,
       pageIndex: this.id - 1,
       annotationLayer: this.findLayer<AnnotationLayerBuilder>(AnnotationLayerBuilder)?.annotationLayer,
-      textLayer: this.findLayer<TextLayerBuilder>(TextLayerBuilder)?.div,
-      drawLayer: this.findLayer<DrawLayerBuilder>(DrawLayerBuilder)?.drawLayer,
+      textLayer: this.findLayer<TextLayerBuilder>(TextLayerBuilder),
+      drawLayer: this._drawLayer,
       viewport: clonedViewport,
-      // todo: l10n
-      l10n: { get(str: string) { return str } } as any as IL10n,
+      l10n: this.l10n as any,
     } as AnnotationEditorLayerOptions)
 
     this._annotationEditorLayer.render({
@@ -62,13 +63,21 @@ export class AnnotationEditorLayerBuilder extends LayerBuilder {
   cancel() {
     super.cancel()
 
-    if (!this.div) return
+    if (!this.div) {
+      return
+    }
+
+    this._drawLayer?.destroy()
+    this._drawLayer = undefined
 
     this._annotationEditorLayer?.destroy()
+    this._annotationEditorLayer = undefined
   }
 
   show() {
-    if (this._annotationEditorLayer?.isInvisible) return
+    if (this._annotationEditorLayer?.isInvisible) {
+      return
+    }
 
     super.show()
   }

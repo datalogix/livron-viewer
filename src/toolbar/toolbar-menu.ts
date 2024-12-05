@@ -14,16 +14,18 @@ export class ToolbarMenu extends ToolbarActionToggle {
   }
 
   private matchActionByName(action: ToolbarAction, name: string): boolean {
-    return action.constructor.name.toLowerCase() === name.toLowerCase()
+    return action.name.toLowerCase() === name.toLowerCase()
   }
 
-  add(action: ToolbarAction, index?: number, group?: number) {
-    if (!action.toolbar) {
-      action.setToolbar(this.toolbar)
-    }
+  add(action: ToolbarAction | ToolbarAction[], index?: number, group?: number) {
+    const actions = Array.isArray(action) ? action : [action]
+
+    actions
+      .filter(a => !a.toolbar)
+      .forEach(a => a.setToolbar(this.toolbar))
 
     if (index === undefined && group === undefined) {
-      this.actions.push(action)
+      this.actions.push(actions)
       return
     }
 
@@ -33,16 +35,16 @@ export class ToolbarMenu extends ToolbarActionToggle {
       }
 
       if (index !== undefined) {
-        this.actions[group].splice(index, 0, action)
+        this.actions[group].splice(index, 0, ...actions)
       } else {
-        this.actions[group].push(action)
+        this.actions[group].push(...actions)
       }
 
       return
     }
 
     if (index !== undefined) {
-      this.actions.splice(index, 0, action)
+      this.actions.splice(index, 0, actions)
     }
   }
 
@@ -74,15 +76,15 @@ export class ToolbarMenu extends ToolbarActionToggle {
     this.actions.flat().forEach(action => action.setToolbar(toolbar))
   }
 
-  async initialize(enabled?: boolean) {
+  async initialize() {
     if (this.initialized) return
 
-    await super.initialize(enabled)
+    await super.initialize()
 
     this.menu = createElement('div', 'toolbar-menu')
     this.container.appendChild(this.menu)
 
-    await Promise.all(this.actions.flat().map(action => action.initialize(enabled)))
+    await Promise.all(this.actions.flat().map(action => action.initialize()))
 
     this.actions.forEach((action) => {
       if (action instanceof ToolbarAction) {

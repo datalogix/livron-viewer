@@ -1,6 +1,6 @@
 import { DEFAULT_CACHE_SIZE } from '@/config'
 import { SpreadMode, ScrollMode } from '@/enums'
-import { type VisibleElements } from '@/utils'
+import type { VisibleElements } from '@/utils'
 import type { Page } from '../page'
 import { Renderable, RenderingQueue, Buffer } from '../rendering'
 import { Manager } from './'
@@ -40,7 +40,8 @@ export class RenderManager extends Manager implements Renderable {
       }
     }
 
-    this.dispatch('rendercleanup', this)
+    this.pdfDocument.cleanup()
+    this.dispatch('rendercleanup')
   }
 
   cancelRendering() {
@@ -67,7 +68,7 @@ export class RenderManager extends Manager implements Renderable {
 
       return pdfPage
     } catch (reason) {
-      console.error('Unable to get page for page view', reason)
+      this.logger.error('Unable to get page for page view', reason)
       return null
     }
   }
@@ -78,14 +79,14 @@ export class RenderManager extends Manager implements Renderable {
     const preRenderExtra = this.spreadMode !== SpreadMode.NONE && this.scrollMode !== ScrollMode.HORIZONTAL
     const page = this.renderingQueue.getHighestPriority(visiblePages, this.pages, scrollAhead, preRenderExtra)
 
-    if (page) {
-      this.ensurePdfPageLoaded(page as Page).then(() => {
-        this.renderingQueue.renderView(page)
-      })
-
-      return true
+    if (!page) {
+      return false
     }
 
-    return false
+    this.ensurePdfPageLoaded(page as Page)
+      .then(() => this.renderingQueue.renderView(page))
+      .catch(reason => this.logger.error(this.l10n.get('error.rendering'), reason))
+
+    return true
   }
 }

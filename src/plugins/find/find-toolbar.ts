@@ -1,6 +1,6 @@
 import { ToolbarActionToggle } from '@/toolbar'
 import { createElement } from '@/utils'
-import { FindState } from './find-plugin'
+import { FindState } from './find-controller'
 
 const MATCHES_COUNT_LIMIT = 1000
 
@@ -62,12 +62,18 @@ export class FindToolbar extends ToolbarActionToggle {
 
     this.on('updatefindmatchescount', ({ matchesCount }) => this.updateResultsCount(matchesCount))
     this.on('updatefindcontrolstate', params => this.updateUIState(params.state, params.previous, params.matchesCount))
+    this.on('documentdestroy', () => this.reset())
   }
 
   destroy() {
-    this.updateUIState()
+    this.reset()
+
     this.bar?.remove()
     this.bar = undefined
+  }
+
+  reset() {
+    this.updateUIState()
   }
 
   dispatchEvent(type = '', findPrev?: boolean) {
@@ -85,7 +91,7 @@ export class FindToolbar extends ToolbarActionToggle {
   updateUIState(state?: FindState, previous?: boolean, matchesCount = {}) {
     if (!this.findField || !this.findMsg) return
 
-    let findMsgId = ''
+    let message = ''
     let status = ''
 
     switch (state) {
@@ -95,24 +101,18 @@ export class FindToolbar extends ToolbarActionToggle {
         status = 'pending'
         break
       case FindState.NOT_FOUND:
-        findMsgId = 'pdfjs-find-not-found'
+        message = this.l10n.get('find.not-found')
         status = 'notFound'
         break
       case FindState.WRAPPED:
-        findMsgId = previous ? 'pdfjs-find-reached-top' : 'pdfjs-find-reached-bottom'
+        message = this.l10n.get(previous ? 'find.reached.top' : 'find.reached.bottom')
         break
     }
 
     this.findField.setAttribute('data-status', status)
     this.findField.setAttribute('aria-invalid', state === FindState.NOT_FOUND ? 'true' : 'false')
     this.findMsg.setAttribute('data-status', status)
-
-    if (findMsgId) {
-      this.findMsg.setAttribute('data-l10n-id', findMsgId)
-    } else {
-      this.findMsg.removeAttribute('data-l10n-id')
-      this.findMsg.textContent = ''
-    }
+    this.findMsg.textContent = message
 
     this.updateResultsCount(matchesCount)
   }
@@ -121,21 +121,15 @@ export class FindToolbar extends ToolbarActionToggle {
     if (!this.findResultsCount) return
 
     if (total <= 0) {
-      this.findResultsCount.removeAttribute('data-l10n-id')
       this.findResultsCount.textContent = ''
       return
     }
 
     const limit = MATCHES_COUNT_LIMIT
 
-    this.findResultsCount.setAttribute(
-      'data-l10n-id',
-      total > limit ? 'pdfjs-find-match-count-limit' : 'pdfjs-find-match-count',
-    )
-    this.findResultsCount.setAttribute(
-      'data-l10n-args',
-      JSON.stringify({ limit, current, total }),
-    )
+    this.findResultsCount.textContent = total > limit
+      ? this.l10n.get('find.match.count-limit', { count: limit })
+      : this.l10n.get('find.match.count', { current, count: total })
   }
 
   open() {
@@ -143,6 +137,9 @@ export class FindToolbar extends ToolbarActionToggle {
 
     this.bar.classList.add('findbar-open')
     this.bar.hidden = false
+
+    this.findField?.select()
+    this.findField?.focus()
   }
 
   close() {
@@ -150,5 +147,7 @@ export class FindToolbar extends ToolbarActionToggle {
 
     this.bar.classList.remove('findbar-open')
     this.bar.hidden = true
+
+    this.dispatch('findbarclose')
   }
 }

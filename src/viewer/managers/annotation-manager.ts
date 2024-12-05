@@ -14,14 +14,12 @@ export class AnnotationManager extends Manager {
   private _annotationEditorUIManager?: AnnotationEditorUIManager
   private _annotationMode!: number
   private _annotationEditorMode!: number
-  private annotationEditorHighlightColors!: string
   private switchAnnotationEditorModeTimeoutId?: NodeJS.Timeout
   private onPageRenderedCallback?: ({ pageNumber }: { pageNumber: number }) => void
 
   init() {
     this._annotationMode = this.options.annotationMode ?? AnnotationMode.ENABLE_FORMS
     this._annotationEditorMode = this.options.annotationEditorMode ?? AnnotationEditorType.NONE
-    this.annotationEditorHighlightColors = this.options.annotationEditorHighlightColors ?? 'yellow=#FFFF98,green=#53FFBC,blue=#80EBFF,pink=#FFCBE6,red=#FF4F5F'
 
     this.on('firstpageloaded', ({ annotationEditorMode }) => {
       this.initAnnotationEditorUIManager(annotationEditorMode)
@@ -30,6 +28,12 @@ export class AnnotationManager extends Manager {
     this.on('onepagerendered', ({ annotationEditorMode }) => {
       if (this.annotationEditorUIManager) {
         this.dispatch('annotationeditormodechanged', { mode: annotationEditorMode })
+      }
+    })
+
+    this.on('switchannotationeditormode', (params) => {
+      if (this.annotationEditorUIManager) {
+        this.annotationEditorMode = params
       }
     })
   }
@@ -45,12 +49,12 @@ export class AnnotationManager extends Manager {
     }
 
     if (this.pdfDocument?.isPureXfa) {
-      console.warn('Warning: XFA-editing is not implemented.')
+      this.logger.warn('Warning: XFA-editing is not implemented.')
       return
     }
 
     if (!isValidAnnotationEditorMode(mode)) {
-      console.error(`Invalid AnnotationEditor mode: ${mode}`)
+      this.logger.error(`Invalid AnnotationEditor mode: ${mode}`)
     }
 
     this._annotationEditorUIManager = new AnnotationEditorUIManager(
@@ -59,9 +63,9 @@ export class AnnotationManager extends Manager {
       null, // altTextManager
       this.eventBus,
       this.pdfDocument,
-      null, // pageColors
-      this.annotationEditorHighlightColors,
-      null, // enableHighlightFloatingButton
+      this.viewer.pageColors,
+      this.options.annotationEditorHighlightColors ?? 'yellow=#FFFF98,green=#53FFBC,blue=#80EBFF,pink=#FFCBE6,red=#FF4F5F',
+      this.options.enableHighlightFloatingButton ?? true,
       null, // enableUpdatedAddImage
       null, // enableNewAltTextWhenAddingImage
       null, // mlManager
@@ -69,9 +73,11 @@ export class AnnotationManager extends Manager {
 
     this.dispatch('annotationeditoruimanager', { uiManager: this._annotationEditorUIManager })
 
-    if (mode !== AnnotationEditorType.NONE) {
-      this._annotationEditorUIManager?.updateMode(mode)
+    if (mode === AnnotationEditorType.NONE) {
+      return
     }
+
+    this._annotationEditorUIManager?.updateMode(mode)
   }
 
   private destroyAnnotationEditorUIManager() {
@@ -145,7 +151,7 @@ export class AnnotationManager extends Manager {
         this.on(
           'pagerendered',
           this.onPageRenderedCallback,
-          { signal: this.documentManager.signal },
+          { signal: this.pagesManager.signal },
         )
 
         return

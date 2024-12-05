@@ -1,4 +1,5 @@
 import type { PageViewport } from '@/pdfjs'
+import { MAX_CANVAS_PIXELS } from '@/config'
 import { createElement, approximateFraction, floorToDivide } from '@/utils'
 import type { Page } from './page'
 
@@ -10,7 +11,7 @@ export class CanvasPage {
 
   constructor(
     private readonly page: Page,
-    private readonly maxCanvasPixels = 2 ** 25,
+    private readonly maxCanvasPixels = MAX_CANVAS_PIXELS,
   ) {}
 
   get canvasWrapper() {
@@ -61,6 +62,10 @@ export class CanvasPage {
     this._canvas.height = floorToDivide(viewport.height * outputScale.sy, sfy[0])
     this._canvas.style.width = floorToDivide(viewport.width, sfx[1]) + 'px'
     this._canvas.style.height = floorToDivide(viewport.height, sfy[1]) + 'px'
+
+    return this.outputScale.sx !== 1 || this.outputScale.sy !== 1
+      ? [outputScale.sx, 0, 0, outputScale.sy, 0, 0]
+      : undefined
   }
 
   isOnlyCssZoom(viewport: PageViewport) {
@@ -87,17 +92,14 @@ export class CanvasPage {
     })
   }
 
-  get transform() {
-    if (!this.outputScale || this.outputScale.sx !== 1 || this.outputScale.sy !== 1) {
-      return undefined
-    }
-
-    return [this.outputScale.sx, 0, 0, this.outputScale.sy, 0, 0]
-  }
-
   show(isLastShow: boolean) {
-    if (isLastShow && (this.canvas && this.canvas.hidden)) {
-      this.canvas.hidden = false
+    if (!this._canvas?.hidden) return
+
+    const { pageColors } = this.page.options
+    const hasHCM = !!(pageColors?.background && pageColors?.foreground)
+
+    if (!hasHCM || isLastShow) {
+      this._canvas.hidden = false
     }
   }
 
@@ -107,7 +109,7 @@ export class CanvasPage {
     this._canvas.width = 0
     this._canvas.height = 0
 
-    this.canvasWrapper?.removeChild(this._canvas)
+    this._canvasWrapper?.removeChild(this._canvas)
 
     delete this._canvas
   }

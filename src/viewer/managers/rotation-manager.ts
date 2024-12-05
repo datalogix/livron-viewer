@@ -1,23 +1,32 @@
 import { Manager } from './manager'
 
-export function isValidRotation(angle: number) {
-  return Number.isInteger(angle) && angle % 90 === 0
+export function isValidRotation(rotation: number) {
+  return Number.isInteger(rotation) && rotation % 90 === 0
 }
 
 export class RotationManager extends Manager {
-  private _pagesRotation = 0
+  private _rotation = 0
+
+  init() {
+    this.on('rotationchanging', ({ pageNumber }) => {
+      this.renderManager.forceRendering()
+
+      // Ensure that the active page doesn't change during rotation.
+      this.pagesManager.currentPageNumber = pageNumber
+    })
+  }
 
   reset() {
-    this._pagesRotation = 0
+    this._rotation = 0
   }
 
-  get pagesRotation() {
-    return this._pagesRotation
+  get rotation() {
+    return this._rotation
   }
 
-  set pagesRotation(rotation) {
+  set rotation(rotation) {
     if (!isValidRotation(rotation)) {
-      throw new Error('Invalid pages rotation angle.')
+      throw new Error('Invalid pages rotation.')
     }
 
     if (!this.pdfDocument) {
@@ -30,11 +39,11 @@ export class RotationManager extends Manager {
       rotation += 360
     }
 
-    if (this.pagesRotation === rotation) {
+    if (this._rotation === rotation) {
       return
     }
 
-    this._pagesRotation = rotation
+    this._rotation = rotation
     const pageNumber = this.currentPageNumber
 
     this.viewer.refresh(true, { rotation })
@@ -44,7 +53,7 @@ export class RotationManager extends Manager {
     }
 
     this.dispatch('rotationchanging', {
-      pagesRotation: rotation,
+      rotation,
       pageNumber,
     })
 

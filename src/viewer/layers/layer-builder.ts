@@ -16,6 +16,10 @@ export abstract class LayerBuilder<T = any> extends Dispatcher {
     super()
   }
 
+  get priority() {
+    return 0
+  }
+
   get name() {
     return this.constructor.name.toLowerCase()
   }
@@ -40,6 +44,10 @@ export abstract class LayerBuilder<T = any> extends Dispatcher {
     return this.abortController?.signal
   }
 
+  get l10n() {
+    return this.options.l10n
+  }
+
   get pdfPage() {
     return this.page.pdfPage
   }
@@ -58,6 +66,10 @@ export abstract class LayerBuilder<T = any> extends Dispatcher {
 
   get layerProperties() {
     return this.options.layerProperties
+  }
+
+  get pdfDocument() {
+    return this.layerProperties.pdfDocument
   }
 
   get layersPage() {
@@ -101,9 +113,10 @@ export abstract class LayerBuilder<T = any> extends Dispatcher {
   }
 
   protected create(name: string, position: number) {
-    this.div = createElement('div', name)
-    this.layersPage.add(this.div, position)
+    const div = this.div = createElement('div', name)
+    this.layersPage.add(div, position)
     this.updateLayerDimensions()
+    return div
   }
 
   process(params: PageUpdate) {
@@ -157,7 +170,7 @@ export abstract class LayerBuilder<T = any> extends Dispatcher {
   }
 
   protected build(): Promise<void> | void {
-    //
+
   }
 
   finish(_renderTask: RenderTask) {
