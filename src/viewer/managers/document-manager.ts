@@ -1,6 +1,6 @@
 import * as pdfjs from '@/pdfjs'
 import { WAIT_LOAD_DOCUMENT } from '@/config'
-import { waitOnEventOrTimeout } from '@/utils'
+import { defineWorker, waitOnEventOrTimeout } from '@/utils'
 import { Manager } from './'
 
 export class DocumentManager extends Manager {
@@ -43,6 +43,8 @@ export class DocumentManager extends Manager {
   }
 
   async openDocument(documentType?: pdfjs.DocumentType, documentFilename?: string) {
+    defineWorker()
+
     this.dispatch('documentopen', { documentType, documentFilename })
 
     await this.closeDocument()

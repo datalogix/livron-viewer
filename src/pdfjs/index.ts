@@ -6,18 +6,12 @@ import type { AnnotationEditorLayerOptions } from 'pdfjs-dist/types/src/display/
 import type { StructTreeNode, StructTreeContent, DocumentInitParameters } from 'pdfjs-dist/types/src/display/api'
 import type { XfaLayerParameters } from 'pdfjs-dist/types/src/display/xfa_layer'
 import type { PrintAnnotationStorage } from 'pdfjs-dist/types/src/display/annotation_storage'
-import { GlobalWorkerOptions } from 'pdfjs-dist'
 
 interface IRenderableView extends BaseIRenderableView {
   get isRenderingFinished(): boolean
 }
 
 export type DocumentType = string | URL | ArrayBuffer | DocumentInitParameters
-
-GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString()
 
 export * from 'pdfjs-dist'
 

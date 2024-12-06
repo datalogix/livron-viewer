@@ -1,6 +1,17 @@
-import { AnnotationEditorType, AnnotationMode, PageViewport, PermissionFlag } from '@/pdfjs'
+import { AnnotationEditorType, AnnotationMode, GlobalWorkerOptions, PageViewport, PermissionFlag } from '@/pdfjs'
 import { ScrollMode, SidebarTypes, SpreadMode, TextLayerMode } from '@/enums'
 import { PageColors } from '@/viewer'
+
+export function defineWorker() {
+  if (GlobalWorkerOptions.workerSrc) {
+    return
+  }
+
+  GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.min.mjs',
+    import.meta.url,
+  ).toString()
+}
 
 export function updateLayerDimensions(
   div: HTMLElement,
