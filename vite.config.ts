@@ -6,6 +6,9 @@ import { name } from './package.json'
 import eslint from 'vite-plugin-eslint2'
 
 export default defineConfig({
+  esbuild: {
+    keepNames: true,
+  },
   plugins: [
     eslint({
       emitErrorAsWarning: true,
