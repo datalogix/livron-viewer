@@ -48,22 +48,47 @@ export class Resource extends ToolbarActionToggle {
   protected item(items: ResourceItem[]) {
     const ul = createElement('ul')
     items.forEach((item) => {
-      const li = createElement('li')
       if (item.src) {
-        li.appendChild(createElement('a', {
+        const li = ul.appendChild(createElement('li'))
+        li.appendChild(createElement('a', this.parseExtension(item.src), {
           innerText: item.name,
           href: item.src,
           target: '_blank',
         }))
-      } else if (item.items && item.items.length) {
-        li.appendChild(createElement('button', {
+      } else if (item.items) {
+        const li = ul.appendChild(createElement('li'))
+        li.appendChild(createElement('span', {
           innerText: item.name,
-          type: 'button',
         }))
         li.appendChild(this.item(item.items))
       }
-      ul.appendChild(li)
     })
     return ul
+  }
+
+  protected parseExtension(path: string) {
+    if (path.endsWith('.txt')) {
+      return 'txt'
+    }
+
+    if (path.endsWith('.pdf')) {
+      return 'pdf'
+    }
+
+    if (path.endsWith('.doc') || path.endsWith('.docx')) {
+      return 'doc'
+    }
+
+    if (path.endsWith('.xls') || path.endsWith('.xlsx')) {
+      return 'xls'
+    }
+
+    if (path.endsWith('.ppt') || path.endsWith('.pptx')) {
+      return 'ppt'
+    }
+
+    if (path.endsWith('.zip') || path.endsWith('.rar')) {
+      return 'zip'
+    }
   }
 }
