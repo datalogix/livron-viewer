@@ -5,7 +5,7 @@ import { isValidRotation, Renderable, ViewerType } from '@/viewer'
 import { destroyTempCanvas } from './helpers'
 import { Thumbnail } from './thumbnail'
 
-const THUMBNAIL_SCROLL_MARGIN = -19
+const THUMBNAIL_SCROLL_MARGIN = -10
 const THUMBNAIL_SELECTED_CLASS = 'selected'
 
 export class ThumbnailViewer extends Dispatcher implements Renderable {
@@ -89,7 +89,11 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
       }
 
       if (shouldScroll) {
-        scrollIntoView(thumbnail.div, { top: THUMBNAIL_SCROLL_MARGIN })
+        scrollIntoView(
+          this.container,
+          thumbnail.div,
+          { top: THUMBNAIL_SCROLL_MARGIN },
+        )
       }
     }
 

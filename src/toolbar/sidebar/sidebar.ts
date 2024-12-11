@@ -18,7 +18,6 @@ export class Sidebar extends ToolbarActionToggle {
   constructor(protected list = new Map<SidebarType, SidebarItem>()) {
     super()
 
-    this.drawer.render(this.element)
     this.element.appendChild(this.menu)
   }
 
@@ -27,6 +26,7 @@ export class Sidebar extends ToolbarActionToggle {
   }
 
   protected init() {
+    this.drawer.render(this.element, this.viewer.rootContainer)
     this.list.forEach((item, key) => this.add(key, item))
 
     this.on('sidebarselect', ({ key, open }) => {

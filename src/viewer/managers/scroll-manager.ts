@@ -42,7 +42,7 @@ export class ScrollManager extends Manager {
 
   init() {
     this.scroll = watchScroll(
-      this.container,
+      this.viewerContainer,
       this.onScrollUpdate.bind(this),
       this.signal,
     )
@@ -90,7 +90,7 @@ export class ScrollManager extends Manager {
       const spread = createElement('div', 'spread')
 
       if (this.isInPresentationMode) {
-        spread.append(createElement('div', 'dummyPage'))
+        spread.append(createElement('div', 'page-dummy'))
       }
 
       for (const i of pageIndexSet) {
@@ -115,7 +115,7 @@ export class ScrollManager extends Manager {
     const horizontal = this.scrollMode === ScrollMode.HORIZONTAL
     const rtl = horizontal && this.containerManager.isContainerRtl
 
-    return getVisibleElements(this.container, pages, true, horizontal, rtl)
+    return getVisibleElements(this.viewerContainer, pages, true, horizontal, rtl)
   }
 
   private onScrollUpdate() {
@@ -135,12 +135,12 @@ export class ScrollManager extends Manager {
     }
 
     if (!pageSpot && !this.isInPresentationMode) {
-      const left = page.div.offsetLeft + page.div.clientLeft
+      const left = page.div.offsetLeft/* + page.div.clientLeft */
       const right = left + page.div.clientWidth
 
       if (this.scrollMode === ScrollMode.HORIZONTAL
-        || left < this.container.scrollLeft
-        || right > this.container.scrollLeft + this.container.clientWidth
+        || left < this.viewerContainer.scrollLeft
+        || right > this.viewerContainer.scrollLeft + this.viewerContainer.clientWidth
       ) {
         pageSpot = {
           left: 0,
@@ -149,7 +149,7 @@ export class ScrollManager extends Manager {
       }
     }
 
-    scrollIntoView(page.div, pageSpot)
+    scrollIntoView(this.viewerContainer, page.div, pageSpot)
 
     if (!this.currentScaleValue && this.location) {
       this.locationManager.reset()
@@ -241,8 +241,8 @@ export class ScrollManager extends Manager {
           hPadding = vPadding = 0
         }
 
-        widthScale = (this.container.clientWidth - hPadding) / width / PixelsPerInch.PDF_TO_CSS_UNITS
-        heightScale = (this.container.clientHeight - vPadding) / height / PixelsPerInch.PDF_TO_CSS_UNITS
+        widthScale = (this.viewerContainer.clientWidth - hPadding) / width / PixelsPerInch.PDF_TO_CSS_UNITS
+        heightScale = (this.viewerContainer.clientHeight - vPadding) / height / PixelsPerInch.PDF_TO_CSS_UNITS
         scale = Math.min(Math.abs(widthScale), Math.abs(heightScale))
         break
       }
@@ -274,11 +274,11 @@ export class ScrollManager extends Manager {
   }
 
   get isHorizontalScrollbarEnabled() {
-    return this.isInPresentationMode ? false : this.container.scrollWidth > this.container.clientWidth
+    return this.isInPresentationMode ? false : this.viewerContainer.scrollWidth > this.viewerContainer.clientWidth
   }
 
   get isVerticalScrollbarEnabled() {
-    return this.isInPresentationMode ? false : this.container.scrollHeight > this.container.clientHeight
+    return this.isInPresentationMode ? false : this.viewerContainer.scrollHeight > this.viewerContainer.clientHeight
   }
 
   getScrollAhead(visible: VisibleElements) {
@@ -323,8 +323,8 @@ export class ScrollManager extends Manager {
   }
 
   private updateScrollMode(pageNumber?: number) {
-    this.viewerContainer.classList.toggle('scrollHorizontal', this.scrollMode === ScrollMode.HORIZONTAL)
-    this.viewerContainer.classList.toggle('scrollWrapped', this.scrollMode === ScrollMode.WRAPPED)
+    this.viewerContainer.classList.toggle('scroll-horizontal', this.scrollMode === ScrollMode.HORIZONTAL)
+    this.viewerContainer.classList.toggle('scroll-wrapped', this.scrollMode === ScrollMode.WRAPPED)
 
     if (!this.pdfDocument || !pageNumber) {
       return

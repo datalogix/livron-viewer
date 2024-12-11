@@ -39,10 +39,12 @@ export class LocationManager extends Manager {
       : currentScaleValue
     const pageNumber = firstPage.id
     const currentPage = this.pages[pageNumber - 1]
-    const container = this.container
-    const topLeft = currentPage.getPagePoint(container.scrollLeft - firstPage.x, container.scrollTop - firstPage.y)
-    const intLeft = Math.round(topLeft[0])
+    const topLeft = currentPage.getPagePoint(
+      this.viewerContainer.scrollLeft - firstPage.x,
+      this.viewerContainer.scrollTop - firstPage.y,
+    )
     const intTop = Math.round(topLeft[1])
+    const intLeft = Math.round(topLeft[0])
     let openParams = `#page=${pageNumber}`
 
     if (!this.isInPresentationMode) {

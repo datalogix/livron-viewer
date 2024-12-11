@@ -65,6 +65,8 @@ export class Viewer extends Dispatcher {
   }
 
   render() {
+    this.dispatch('rendered')
+
     return this.containerManager.container
   }
 

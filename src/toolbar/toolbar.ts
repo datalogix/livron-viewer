@@ -9,7 +9,7 @@ export type ToolbarOptions = {
 }
 
 export class Toolbar extends Dispatcher {
-  protected readonly container: HTMLDivElement
+  readonly container: HTMLDivElement
   protected readonly list = new Map<string, ToolbarItemType>()
   protected readonly _items = new Map<string, ToolbarItem>()
 
@@ -20,6 +20,10 @@ export class Toolbar extends Dispatcher {
     super()
     this.container = options?.container ?? createElement('div')
     this.container.classList.add('toolbar')
+  }
+
+  get rootContainer() {
+    return this.container.parentElement ?? this.container
   }
 
   get eventBus() {

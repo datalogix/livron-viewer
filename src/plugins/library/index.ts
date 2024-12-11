@@ -1,8 +1,3 @@
+export * from './book'
 export * from './library-plugin'
 export * from './library-toolbar-item'
-
-export * from './interaction-layer-builder'
-export * from './interaction-plugin'
-export * from './interaction-service'
-export * from './interaction-sidebar-item'
-export * from './interaction'

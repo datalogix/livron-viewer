@@ -48,6 +48,7 @@
   &.toolbar-menu-open {
     .toolbar-menu {
       @apply
+        z-100002
         visible
         translate-x-0
       ;

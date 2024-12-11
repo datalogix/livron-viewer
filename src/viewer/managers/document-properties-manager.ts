@@ -91,7 +91,7 @@ export class DocumentPropertiesManager extends Manager {
 
     if (!isEmbedded() && this.documentTitle) {
       document.title = this.documentTitle
-      this.dispatch('updatedocumenttitle', { title: this.documentTitle })
+      this.dispatch('documenttitleupdated', { title: this.documentTitle })
     }
 
     pdfDocument.getDownloadInfo().then(({ length }) => {

@@ -2,6 +2,7 @@ import * as pdfjs from '@/pdfjs'
 import { createElement } from '@/utils'
 
 export class PrintService {
+  private printContainer?: HTMLDivElement
   private pageStyleSheet?: HTMLStyleElement
   private scratchCanvas?: HTMLCanvasElement = createElement('canvas')
   private optionalContentConfigPromise: Promise<pdfjs.OptionalContentConfig>
@@ -10,7 +11,6 @@ export class PrintService {
   constructor(
     private pdfDocument: pdfjs.PDFDocumentProxy,
     private pagesOverview: { width: number, height: number, rotation: number }[],
-    private printContainer: HTMLDivElement,
     private printResolution = 150,
     private printAnnotationStoragePromise: Promise<pdfjs.PrintAnnotationStorage | undefined> = Promise.resolve(undefined),
   ) {
@@ -35,8 +35,8 @@ export class PrintService {
   }
 
   layout() {
-    const { body } = this.printContainer.ownerDocument
-    body.setAttribute('data-printing', 'true')
+    this.printContainer = document.body.appendChild(createElement('div', 'print-container'))
+    this.printContainer.parentElement?.setAttribute('data-printing', 'true')
 
     const { width, height } = this.pagesOverview[0]
     const hasEqualPageSizes = this.pagesOverview.every(size => size.width === width && size.height === height)
@@ -47,12 +47,14 @@ export class PrintService {
 
     this.pageStyleSheet = createElement('style')
     this.pageStyleSheet.textContent = `@page { size: ${width}pt ${height}pt;}`
-    body.append(this.pageStyleSheet)
+
+    document.head.append(this.pageStyleSheet)
   }
 
   destroy() {
-    this.printContainer.textContent = ''
-    this.printContainer.ownerDocument.body.removeAttribute('data-printing')
+    this.printContainer?.parentElement?.removeAttribute('data-printing')
+    this.printContainer?.remove()
+    this.printContainer = undefined
 
     this.pageStyleSheet?.remove()
     this.pageStyleSheet = undefined
@@ -101,7 +103,7 @@ export class PrintService {
 
     const wrapper = createElement('div', 'page-printed')
     wrapper.append(img)
-    this.printContainer.append(wrapper)
+    this.printContainer?.append(wrapper)
 
     const { promise, resolve, reject } = Promise.withResolvers()
     img.onload = resolve
@@ -130,8 +132,8 @@ export class PrintService {
     }
 
     for (const xfaPage of xfaHtml.children) {
-      const page = createElement('div', 'xfaPrintedPage')
-      this.printContainer.append(page)
+      const page = createElement('div', 'xfa-page-printed')
+      this.printContainer?.append(page)
 
       const viewport = pdfjs.getXfaPageViewport(xfaPage, { scale })
       const xfaLayerDiv = createElement('div')

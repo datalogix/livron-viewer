@@ -114,11 +114,11 @@ export class ToolbarMenu extends ToolbarActionToggle {
 
   open() {
     this.container.classList.add('toolbar-menu-open')
-    setTimeout(() => this.container.ownerDocument.addEventListener('click', this.onDocumentClickListener), 0)
+    setTimeout(() => this.toolbar.rootContainer.addEventListener('click', this.onDocumentClickListener), 0)
   }
 
   close() {
     this.container.classList.remove('toolbar-menu-open')
-    this.container.ownerDocument.removeEventListener('click', this.onDocumentClickListener)
+    this.toolbar.rootContainer.removeEventListener('click', this.onDocumentClickListener)
   }
 }

@@ -4,8 +4,8 @@ import type { ViewerType } from '@/viewer'
 import { normalizeWheelEventDelta } from '@/utils'
 
 const DELAY_BEFORE_HIDING_CONTROLS = 3000
-const ACTIVE_SELECTOR = 'pdfPresentationMode'
-const CONTROLS_SELECTOR = 'pdfPresentationModeControls'
+const ACTIVE_SELECTOR = 'presentation-mode'
+const CONTROLS_SELECTOR = 'presentation-mode-controls'
 const MOUSE_SCROLL_COOLDOWN_TIME = 50
 const PAGE_SWITCH_THRESHOLD = 0.1
 const SWIPE_MIN_DISTANCE_THRESHOLD = 50

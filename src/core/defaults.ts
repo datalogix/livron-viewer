@@ -11,6 +11,7 @@ export const DEFAULT_PLUGINS: plugins.PluginType[] = [
   plugins.LoadingPlugin,
   plugins.LibraryPlugin,
   plugins.NotifyPlugin,
+  plugins.OpenPlugin,
   plugins.PresentationPlugin,
   plugins.PrintPlugin,
   plugins.ResizePlugin,
@@ -36,7 +37,7 @@ export const DEFAULT_TOOLBAR_ITEMS = new Map<string, toolbar.ToolbarItemType>([
   ['cursor-select', plugins.CursorSelect],
 
   // document
-  ['open', toolbar.Open],
+  ['open', plugins.OpenToolbarItem],
   ['download', plugins.DownloadToolbarItem],
   ['print', plugins.PrintToolbarItem],
   ['presentation', plugins.PresentationToolbarItem],
@@ -58,6 +59,9 @@ export const DEFAULT_TOOLBAR_ITEMS = new Map<string, toolbar.ToolbarItemType>([
   ['next-page', toolbar.NextPage],
   ['prev-page', toolbar.PrevPage],
   ['paginate', toolbar.Paginate],
+
+  // resource
+  ['resource', toolbar.Resource],
 
   // rotate
   ['rotate-cw', toolbar.RotateCw],

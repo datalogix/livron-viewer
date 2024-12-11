@@ -1,11 +1,12 @@
- @use 'toolbar';
- @use 'interactions';
- @use 'interaction-modal';
- @use 'progress-tracker';
- @use 'modal';
- @use 'sidebar';
- @use 'drawer';
- @use 'bookmark';
- @use 'library';
 
- @import url(viewer.css);
+@use 'layers';
+@use 'plugins';
+@use 'toolbar';
+@use 'tools';
+@use 'viewer';
+@use 'pdfon';
+
+@import url(layers/annotation-editor-layer-builder.css);
+@import url(layers/annotation-layer-builder.css);
+@import url(layers/text-layer-builder.css);
+@import url(layers/xfa-layer-builder.css);

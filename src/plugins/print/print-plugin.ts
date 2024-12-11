@@ -15,7 +15,6 @@ export class PrintPlugin extends Plugin {
     ])
   }
 
-  private printContainer?: HTMLDivElement
   private printService?: PrintService
   private printAnnotationStoragePromise?: Promise<PrintAnnotationStorage | undefined>
 
@@ -32,8 +31,6 @@ export class PrintPlugin extends Plugin {
   }
 
   protected init() {
-    this.printContainer = this.rootContainer.appendChild(createElement('div', 'print-container'))
-
     this.on('beforeprint', () => this.onBeforePrint())
     this.on('afterprint', () => this.onAfterPrint())
     this.on('print', () => this.triggerPrint())
@@ -69,8 +66,8 @@ export class PrintPlugin extends Plugin {
   }
 
   protected destroy() {
-    this.printContainer?.remove()
-    this.printContainer = undefined
+    this.printService?.destroy()
+    this.printService = undefined
     window.print = print
   }
 
@@ -98,7 +95,7 @@ export class PrintPlugin extends Plugin {
       .catch(() => {})
       .then(() => this.pdfDocument?.annotationStorage.print)
 
-    if (!this.pdfDocument || !this.printContainer) {
+    if (!this.pdfDocument) {
       return
     }
 
@@ -119,7 +116,6 @@ export class PrintPlugin extends Plugin {
     this.printService = new PrintService(
       this.pdfDocument,
       this.viewer.getPagesOverview(),
-      this.printContainer,
       this.resolution,
       this.printAnnotationStoragePromise,
     )

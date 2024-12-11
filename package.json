@@ -1,8 +1,8 @@
 {
-  "name": "livron-viewer",
+  "name": "pdfon",
   "version": "0.0.2",
-  "description": "Livron viewer",
-  "repository": "datalogix/livron-viewer",
+  "description": "",
+  "repository": "datalogix/pdfon",
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
@@ -53,5 +53,5 @@
     "vite": "^5.4.11",
     "vite-plugin-eslint2": "^5.0.3"
   },
-  "packageManager": "pnpm@9.14.2"
+  "packageManager": "pnpm@9.15.0"
 }

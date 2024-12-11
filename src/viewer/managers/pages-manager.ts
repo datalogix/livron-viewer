@@ -410,7 +410,7 @@ export class PagesManager extends Manager {
       }
 
       onePageRenderedOrForceFetch(
-        this.container,
+        this.viewerContainer,
         this.scrollManager.getVisiblePages(),
         this.onePageRenderedCapability.promise,
         signal,

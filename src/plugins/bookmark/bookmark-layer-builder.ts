@@ -8,7 +8,7 @@ export class BookmarkLayerBuilder extends LayerBuilder {
   }
 
   protected async build() {
-    const div = this.create('bookmarkLayer', -1)
+    const div = this.create('bookmark-layer', -1)
     const button = div.appendChild(createElement('button', 'bookmark', { type: 'button' }))
     button.addEventListener('click', () => this.bookmarkService?.addOrDelete(this.id))
 

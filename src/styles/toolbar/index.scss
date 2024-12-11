@@ -1,56 +1,16 @@
 @use 'toolbar';
-@use 'first-page';
-@use 'last-page';
-@use 'prev-page';
-@use 'next-page';
-@use 'input-page';
-@use 'paginator';
-@use 'zoom-in';
-@use 'zoom-out';
-@use 'zoom-select';
-@use 'cursor-select';
-@use 'cursor-hand';
-@use 'rotate-cw';
-@use 'rotate-ccw';
-@use 'spread-odd';
-@use 'spread-even';
-@use 'spread-none';
-@use 'scroll-page';
-@use 'scroll-vertical';
-@use 'scroll-horizontal';
-@use 'scroll-wrapped';
-@use 'presentation-mode';
-@use 'sidebar';
-@use 'menu';
+@use 'toolbar-item';
+@use 'toolbar-group';
+@use 'toolbar-action';
+@use 'toolbar-action-group';
+
+@use 'annotation';
 @use 'information';
-@use 'find';
-@use 'library';
-
-
-.toolbar-item-currentpage > button:before {
-  @apply i-ph:eye;
-}
-
-.toolbar-item-download > button:before {
-  @apply i-ph:download;
-}
-
-.toolbar-item-open > button:before {
-  @apply i-ph:folder-open;
-}
-
-.toolbar-item-print > button:before {
-  @apply i-ph:printer;
-}
-
-.toolbar-item-annotationink > button:before {
-  @apply i-ph:pen-thin;
-}
-
-.toolbar-item-annotationfreetext > button:before {
-  @apply i-ph:text;
-}
-
-.toolbar-item-annotationhighlight > button:before {
-  @apply i-material-symbols:format-ink-highlighter-outline
-}
+@use 'menu';
+@use 'pagination';
+@use 'resource';
+@use 'rotate';
+@use 'scroll';
+@use 'sidebar';
+@use 'spread';
+@use 'zoom';

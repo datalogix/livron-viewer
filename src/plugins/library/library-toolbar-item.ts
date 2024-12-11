@@ -2,7 +2,7 @@ import { ToolbarActionToggle } from '@/toolbar'
 import { Modal } from '@/tools'
 import { createElement, waitOnEventOrTimeout } from '@/utils'
 import { LibraryPlugin } from './library-plugin'
-import type { Book } from './types'
+import type { Book } from './book'
 
 export class LibraryToolbarItem extends ToolbarActionToggle {
   protected persist = false
@@ -41,7 +41,7 @@ export class LibraryToolbarItem extends ToolbarActionToggle {
       backdrop: 'overlay',
       persist: this.persist,
       onClose: () => this.execute(),
-    }).classList.add('library')
+    }).classList.add('library-modal')
   }
 
   close() {
@@ -53,10 +53,10 @@ export class LibraryToolbarItem extends ToolbarActionToggle {
     const info = createElement('div', 'info')
     const ul = createElement('ul')
 
-    if (book.sku) ul.append(createElement('li', { innerHTML: this.l10n.get('library.sku', { sku: book.sku }) }))
-    if (book.pages) ul.append(createElement('li', { innerHTML: this.l10n.get('library.pages', { pages: book.pages }) }))
-    if (book.interactions) ul.append(createElement('li', { innerHTML: this.l10n.get('library.interactions', { interactions: book.interactions.length }) }))
-    if (book.author) ul.append(createElement('li', { innerHTML: this.l10n.get('library.author', { author: book.author }) }))
+    if (book.pages) ul.append(createElement('li', { innerHTML: `${this.l10n.get('library.book.pages')}: <b>${book.pages}</b>` }))
+    if (book.sku) ul.append(createElement('li', { innerHTML: `${this.l10n.get('library.book.sku')}: <b>${book.sku}</b>` }))
+    if (book.interactions) ul.append(createElement('li', { innerHTML: `${this.l10n.get('library.book.interactions')}: <b>${book.interactions.length}</b>` }))
+    if (book.author) ul.append(createElement('li', { innerHTML: `${this.l10n.get('library.book.author')}: <b>${book.author}</b>` }))
     if (book.description) ul.append(createElement('li', 'description', { innerHTML: book.description }))
 
     info.appendChild(createElement('h2', { innerText: book.name }))
@@ -65,8 +65,9 @@ export class LibraryToolbarItem extends ToolbarActionToggle {
     button.appendChild(book.cover ? createElement('img', { src: book.cover }) : createElement('i'))
     button.appendChild(info)
     button.addEventListener('click', () => {
+      if (!this.library) return
       this.close()
-      this.library?.open(book)
+      this.library.book = book
     })
 
     return button

@@ -23,7 +23,7 @@ export type VisibleElements = {
 }
 
 export function getVisibleElements(
-  scrollEl: Element,
+  scrollEl: HTMLElement,
   views: VisibleView[],
   sortByVisibility?: boolean,
   horizontal?: boolean,
@@ -36,13 +36,13 @@ export function getVisibleElements(
 
   function isElementBottomAfterViewTop(view: VisibleView) {
     const element = view.div
-    const elementBottom = element.offsetTop + element.clientTop + element.clientHeight
+    const elementBottom = element.offsetTop/* + element.clientTop */ + element.clientHeight
     return elementBottom > top
   }
 
   function isElementNextAfterViewHorizontally(view: VisibleView) {
     const element = view.div
-    const elementLeft = element.offsetLeft + element.clientLeft
+    const elementLeft = element.offsetLeft/* + element.clientLeft */
     const elementRight = elementLeft + element.clientWidth
     return rtl ? elementLeft < right : elementRight > left
   }
@@ -51,17 +51,17 @@ export function getVisibleElements(
     if (index < 2) return index
 
     let elt = views[index].div
-    let pageTop = elt.offsetTop + elt.clientTop
+    let pageTop = elt.offsetTop/* + elt.clientTop */
 
     if (pageTop >= top) {
       elt = views[index - 1].div
-      pageTop = elt.offsetTop + elt.clientTop
+      pageTop = elt.offsetTop/* + elt.clientTop */
     }
 
     for (let i = index - 2; i >= 0; --i) {
       elt = views[i].div
 
-      if (elt.offsetTop + elt.clientTop + elt.clientHeight <= pageTop) {
+      if (elt.offsetTop/* + elt.clientTop */ + elt.clientHeight <= pageTop) {
         break
       }
 
@@ -99,8 +99,8 @@ export function getVisibleElements(
   for (let i = firstVisibleElementInd; i < numViews; i++) {
     const view = views[i]
     const element = view.div
-    const currentWidth = element.offsetLeft + element.clientLeft
-    const currentHeight = element.offsetTop + element.clientTop
+    const currentWidth = element.offsetLeft/* + element.clientLeft */ - scrollEl.offsetLeft
+    const currentHeight = element.offsetTop/* + element.clientTop */ - scrollEl.offsetTop
     const viewWidth = element.clientWidth
     const viewHeight = element.clientHeight
     const viewRight = currentWidth + viewWidth

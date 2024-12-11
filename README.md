@@ -1,13 +1,11 @@
-# Livron - Viewer
+# Pdfon
 
-- Revisar o estilos
-- Informações - Preencher as informações do livro
-- Interações - Atualizar em tempo real
-- Recursos Extras
+- find
+- revisar modais
+- (download) alterar o nome do arquivo
 
 - Modo offline
 - Marca d'água - Implementar marca d'água nas páginas ou usar ou pdf?
-
 - Rastreador de progresso (Progress tracker)
   - Quantidade de páginas visualizadas vs quantidade de páginas
   - Quantidade de interações clicadas vs quantidade de interações

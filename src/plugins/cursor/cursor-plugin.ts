@@ -23,7 +23,7 @@ export class CursorPlugin extends Plugin {
   private handTool?: HandTool
 
   protected init() {
-    this.handTool = new HandTool(this.container)
+    this.handTool = new HandTool(this.viewerContainer)
 
     this.on('switchcursortool', (evt: { reset: boolean, tool: CursorTool }) => {
       if (!evt.reset) {

@@ -5,10 +5,11 @@ export class Menu extends toolbar.ToolbarMenu {
   constructor(actions = [
     [
       new toolbar.Information(),
+      new toolbar.Resource(),
       new plugins.LibraryToolbarItem(),
     ],
     [
-      new toolbar.Open(),
+      new plugins.OpenToolbarItem(),
       new plugins.DownloadToolbarItem(),
       new plugins.PrintToolbarItem(),
       new plugins.PresentationToolbarItem(),
@@ -39,5 +40,13 @@ export class Menu extends toolbar.ToolbarMenu {
     ],
   ]) {
     super(actions)
+  }
+
+  async initialize() {
+    await super.initialize()
+
+    this.toggle(true)
+
+    this.on('pagesdestroy', () => this.toggle(true))
   }
 }

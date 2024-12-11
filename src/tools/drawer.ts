@@ -62,7 +62,7 @@ export class Drawer {
     this.container.classList.add('drawer-opened')
 
     if (this.options.closeOnEscape) {
-      this.container.ownerDocument.addEventListener('keydown', this.onKeydownListener)
+      this.container.parentElement?.addEventListener('keydown', this.onKeydownListener)
     }
   }
 
@@ -79,7 +79,7 @@ export class Drawer {
     this.container.classList.remove('drawer-opened')
 
     if (this.options.closeOnEscape) {
-      this.container.ownerDocument.removeEventListener('keydown', this.onKeydownListener)
+      this.container.parentElement?.removeEventListener('keydown', this.onKeydownListener)
     }
 
     if (this.options.onClose) {

@@ -12,7 +12,7 @@ const THUMBNAIL_WIDTH = 100
 
 export class Thumbnail extends RenderView {
   private readonly anchor = createElement('a')
-  private readonly placeholderImg = createElement('div', 'thumbnailImage')
+  private readonly placeholderImg = createElement('div', 'thumbnail-image')
   private pageLabel?: string
   private image?: HTMLImageElement
   private canvas?: HTMLCanvasElement
@@ -55,8 +55,8 @@ export class Thumbnail extends RenderView {
     this.canvasHeight = (this.canvasWidth / (this.viewport.width / this.viewport.height)) | 0
     this._scale = this.canvasWidth / this.viewport.width
 
-    this.div.style.setProperty('--thumbnail-width', `${this.canvasWidth}px`)
-    this.div.style.setProperty('--thumbnail-height', `${this.canvasHeight}px`)
+    this.div.style.width = `${this.canvasWidth}px`
+    this.div.style.height = `${this.canvasHeight}px`
   }
 
   protected setViewport(scale?: number, clone?: boolean) {
@@ -87,7 +87,7 @@ export class Thumbnail extends RenderView {
 
   update({ rotation }: { rotation?: number }) {
     if (typeof rotation === 'number') {
-      this._rotation = rotation // The rotation may be zero.
+      this._rotation = rotation
     }
 
     this.setViewport(1, true)
@@ -102,7 +102,7 @@ export class Thumbnail extends RenderView {
     const { ctx, canvas: pageDrawCanvas } = createScaledCanvasContext(this.canvasWidth, this.canvasHeight, 1, true)
     const reducedCanvas = reduceImage(canvas, ctx, pageDrawCanvas, MAX_NUM_SCALING_STEPS)
 
-    this.image = createElement('img', 'thumbnailImage', {
+    this.image = createElement('img', 'thumbnail-image', {
       'src': reducedCanvas.toDataURL(),
       'aria-label': this.options.l10n.get('thumbnail.image', { page: this.pageLabel ?? this.id }),
     })

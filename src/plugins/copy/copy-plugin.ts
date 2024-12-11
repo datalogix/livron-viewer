@@ -51,7 +51,7 @@ export class CopyPlugin extends Plugin {
     }
 
     this.getAllTextInProgress = true
-    this.viewerContainer.classList.add('copyAll')
+    this.viewerContainer.classList.add('copy-all')
 
     const abortController = new AbortController()
 
@@ -70,7 +70,7 @@ export class CopyPlugin extends Plugin {
     }).finally(() => {
       this.getAllTextInProgress = false
       this.interruptCopyCondition = false
-      this.viewerContainer.classList.remove('copyAll')
+      this.viewerContainer.classList.remove('copy-all')
       abortController.abort()
     })
 

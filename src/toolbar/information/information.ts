@@ -6,7 +6,7 @@ export type InformationItem = {
   name: string
   value: string | number
   total?: number
-  priority?: number
+  order?: number
 }
 
 export class Information extends ToolbarActionToggle {
@@ -17,8 +17,21 @@ export class Information extends ToolbarActionToggle {
   }
 
   protected init() {
+    this.on(['documentopen', 'documentdestroy'], () => {
+      this.items.clear()
+      this.toggle()
+    })
+
+    this.on('informationupdate', ({ informations }) => {
+      this.items = informations
+      this.toggle()
+    })
+
     this.on('informationadd', ({ key, information }) => {
-      this.items.set(key, information)
+      this.items.set(key, {
+        order: information.order ?? this.items.size,
+        ...information,
+      })
       this.toggle()
     })
 
@@ -31,9 +44,11 @@ export class Information extends ToolbarActionToggle {
   open() {
     const content = createElement('ul', 'information')
 
-    Array.from(this.items.values()).sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0)).forEach((item) => {
-      content.appendChild(this.item(item.name, item.value, item.total))
-    })
+    Array.from(this.items.values())
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      .forEach((item) => {
+        content.appendChild(this.item(item.name, item.value, item.total))
+      })
 
     Modal.open(content, {
       title: this.l10n.get('information.title'),
@@ -49,10 +64,10 @@ export class Information extends ToolbarActionToggle {
   protected item(title: string, value: string | number, total?: number) {
     const header = createElement('header', 'header')
     header.appendChild(createElement('span', 'name', {
-      innerText: title,
+      innerHTML: title,
     }))
     header.appendChild(createElement('span', 'value', {
-      innerText: typeof total === 'number' ? `${value} de ${total}` : value,
+      innerHTML: typeof total === 'number' ? `${value} de ${total}` : value,
     }))
 
     const div = createElement('div', 'item')

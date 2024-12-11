@@ -7,7 +7,7 @@ export class ThumbnailSidebarItem extends SidebarItem {
   protected thumbnailViewer?: ThumbnailViewer
 
   build() {
-    const container = createElement('div', 'thumbnail-sidebar-item')
+    const container = createElement('div', 'thumbnail-sidebar')
 
     this.thumbnailViewer = new ThumbnailViewer(container, this.viewer, this.signal)
     this.thumbnailViewer.setDocument(this.viewer.getDocument())
@@ -17,7 +17,7 @@ export class ThumbnailSidebarItem extends SidebarItem {
     })
 
     this.on('pagesinit', ({ pdfDocument }) => this.thumbnailViewer?.setDocument(pdfDocument))
-    this.on('pagesdestroy', () => this.destroy())
+    this.on('pagesdestroy', () => this.thumbnailViewer?.destroy())
     this.on('pagechanging', ({ pageNumber }) => {
       if (this.opened) {
         this.thumbnailViewer?.scrollIntoView(pageNumber)
@@ -28,11 +28,16 @@ export class ThumbnailSidebarItem extends SidebarItem {
       const page = this.viewer.getPage(pageNumber - 1)
 
       if (this.opened && this.thumbnailViewer && page) {
-        this.thumbnailViewer.getThumbnail(pageNumber - 1).setImage(page)
+        // this.thumbnailViewer.getThumbnail(pageNumber - 1).setImage(page)
       }
     })
 
-    this.on('pagelabels', ({ labels }) => this.thumbnailViewer!.pageLabels = labels)
+    this.on('pagelabels', ({ labels }) => {
+      if (this.thumbnailViewer) {
+        this.thumbnailViewer.pageLabels = labels
+      }
+    })
+
     this.on('thumbnailrendered', ({ pageNumber }) => {
       const page = this.viewer.getPage(pageNumber - 1)
 
@@ -41,7 +46,12 @@ export class ThumbnailSidebarItem extends SidebarItem {
       }
     })
 
-    this.on('rotationchanging', ({ rotation }) => this.thumbnailViewer!.rotation = rotation)
+    this.on('rotationchanging', ({ rotation }) => {
+      if (this.thumbnailViewer) {
+        this.thumbnailViewer.rotation = rotation
+      }
+    })
+
     this.on('rendercleanup', () => this.thumbnailViewer?.cleanup())
     this.on('presentationmodechanged', ({ state }) => {
       if (this.opened && state === PresentationModeState.NORMAL) {

@@ -9,7 +9,7 @@ export class BookmarkSidebarItem extends SidebarItem {
   }
 
   build() {
-    const container = createElement('div', 'bookmarks')
+    const container = createElement('div', 'bookmark-sidebar')
     this.on(['bookmarkloaded', 'bookmarkupdated'], ({ bookmarks }) => this.renderList(container, bookmarks))
     this.renderList(container, this.bookmarkService?.all())
     return container

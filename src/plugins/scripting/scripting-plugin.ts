@@ -8,14 +8,14 @@ export class ScriptingPlugin extends Plugin {
     return this._scriptingManager
   }
 
-  protected init(): Promise<void> | void {
+  protected init() {
     this._scriptingManager = new ScriptingManager(this.viewer)
 
     this.on('onepagerendered', ({ pdfDocument }) => this._scriptingManager?.setDocument(pdfDocument))
     this.on('documentclose', () => this._scriptingManager?.setDocument())
   }
 
-  protected destroy(): Promise<void> | void {
+  protected destroy() {
     this._scriptingManager?.setDocument()
     this._scriptingManager = undefined
   }

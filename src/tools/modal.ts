@@ -24,7 +24,7 @@ export class Modal {
     let header = undefined
 
     if (options.title) {
-      header = createElement('header', 'modal-header', { innerText: options.title })
+      header = createElement('header', 'modal-header', { innerHTML: options.title })
       container.appendChild(header)
     }
 

@@ -131,6 +131,10 @@
     "library": {
       "label": "Biblioteca",
       "title": "Biblioteca"
+    },
+    "resource": {
+      "label": "Recursos",
+      "title": "Recursos"
     }
   },
   "sidebar": {
@@ -186,15 +190,25 @@
   },
   "library": {
     "title": "Biblioteca",
-    "sku": "SKU: <b>{{ sku }}</b>",
-    "pages": "Número de páginas: <b>{{ pages }}</b>",
-    "interactions": "Interações: <b>{{ interactions }}</b>",
-    "author": "Autor: <b>{{ author }}</b>"
+    "book": {
+      "name": "Nome do livro",
+      "sku": "SKU",
+      "pages": "Número de páginas",
+      "author": "Autor",
+      "description": "Descrição",
+      "interactions": "Interações"
+    }
   },
   "interaction": {
     "title": "Interações",
     "progress": "{{ value }} de {{ total }}",
     "filter": "Apenas não finalizadas",
     "page": "Página {{ page }}"
+  },
+  "resource": {
+    "title": "Recursos"
+  },
+  "open": {
+    "description": "Arraste e solte o PDF"
   }
 }

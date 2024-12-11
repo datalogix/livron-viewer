@@ -5,7 +5,6 @@ export class ContainerManager extends Manager {
   private _container!: HTMLDivElement
   private _viewerContainer!: HTMLDivElement
   private previousContainerHeight = 0
-  private _containerTopLeft?: [number, number]
   private resizeObserver = new ResizeObserver(this.onResizeObserver.bind(this))
 
   get rootContainer() {
@@ -21,20 +20,20 @@ export class ContainerManager extends Manager {
   }
 
   get isContainerRtl() {
-    return getComputedStyle(this.container).direction === 'rtl'
-  }
-
-  get containerTopLeft() {
-    return this._containerTopLeft ||= [this.container.offsetTop, this.container.offsetLeft]
+    return getComputedStyle(this.rootContainer).direction === 'rtl'
   }
 
   init() {
     this._container = this.options.container ?? createElement('div')
-    this._viewerContainer = createElement('div', 'pdfViewer', { id: 'viewer' })
+    this._viewerContainer = createElement('div', 'viewer-container')
     this.container.appendChild(this.viewerContainer)
-    this.container.id = 'viewerContainer'
-    this.resizeObserver.observe(this.container)
+    this.container.classList.add('viewer')
+    this.resizeObserver.observe(this.viewerContainer)
     this.updateContainerHeightCss()
+
+    if (this.options.removePageBorders) {
+      this.viewerContainer.classList.add('remove-page-borders')
+    }
 
     this.options.abortSignal?.addEventListener(
       'abort',
@@ -47,13 +46,17 @@ export class ContainerManager extends Manager {
 
     this.on('firstpageloaded', ({ pdfDocument, viewport }) => {
       this.setScaleFactor(viewport.scale)
-      applyHighlightHCMFilter(this.container, this.viewer.pageColors, pdfDocument.filterFactory)
+      applyHighlightHCMFilter(this.viewerContainer, this.viewer.pageColors, pdfDocument.filterFactory)
     })
 
     this.on('metadataloaded', ({ info }) => {
       if ('Language' in info && info.Language) {
         this.viewerContainer.lang = String(info.Language)
       }
+    })
+
+    this.on('rendered', () => {
+      this.rootContainer.dir = this.l10n.getDirection()
     })
   }
 
@@ -74,18 +77,17 @@ export class ContainerManager extends Manager {
     this.viewerContainer.style.setProperty('--scale-factor', scale.toString())
   }
 
-  private updateContainerHeightCss(height = this.container.clientHeight) {
+  private updateContainerHeightCss(height = this.viewerContainer.clientHeight) {
     if (height !== this.previousContainerHeight) {
       this.previousContainerHeight = height
-      document.documentElement.style.setProperty('--viewer-container-height', `${height}px`)
+      this.viewerContainer.style.setProperty('--viewer-container-height', `${height}px`)
     }
   }
 
   private onResizeObserver(entries: ResizeObserverEntry[]) {
     for (const entry of entries) {
-      if (entry.target === this.container) {
+      if (entry.target === this.viewerContainer) {
         this.updateContainerHeightCss(Math.floor(entry.borderBoxSize[0].blockSize))
-        this._containerTopLeft = undefined
         break
       }
     }

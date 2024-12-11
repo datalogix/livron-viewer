@@ -1,9 +1,14 @@
 export function scrollIntoView(
+  scrollEl: HTMLElement,
   element: HTMLElement,
   spot?: { top?: number, left?: number },
   scrollMatches?: boolean,
 ) {
-  let parent = element.offsetParent as HTMLElement
+  let offsetY = element.offsetTop - scrollEl.offsetTop
+  let offsetX = element.offsetLeft - scrollEl.offsetLeft
+
+  /*
+  let parent = element.parentElement as HTMLElement
 
   if (!parent) {
     console.error('offsetParent is not set -- cannot scroll')
@@ -19,12 +24,13 @@ export function scrollIntoView(
   while ((isSameHeightAndWidth || scrollMatches) && isMarkedOrHidden) {
     offsetY += parent.offsetTop
     offsetX += parent.offsetLeft
-    parent = parent.offsetParent as HTMLElement
+    parent = parent.parentElement as HTMLElement
 
     if (!parent) {
       return
     }
   }
+  */
 
   if (spot) {
     if (spot.top !== undefined) {
@@ -32,11 +38,11 @@ export function scrollIntoView(
     }
     if (spot.left !== undefined) {
       offsetX += spot.left
-      parent.scrollLeft = offsetX
+      scrollEl.scrollLeft = offsetX
     }
   }
 
-  parent.scrollTop = offsetY
+  scrollEl.scrollTop = offsetY
 }
 
 type ScrollState = {

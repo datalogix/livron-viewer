@@ -13,7 +13,7 @@ export class NotifyPlugin extends Plugin {
     const content = key ? this.l10n.get(key) : message ?? ''
 
     Modal.open(
-      createElement('div', { innerText: content }),
+      createElement('div', { innerHTML: content }),
       { title: this.l10n.get(`notify.${type}`) },
     ).classList.add(`modal-${type}`)
 

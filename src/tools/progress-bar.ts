@@ -69,6 +69,7 @@ export class ProgressBar {
     }
 
     this.span.addEventListener('transitionend', onTransitionEnd)
+    if (pct === 100 && this.onEnd) this.onEnd()
   }
 
   render() {

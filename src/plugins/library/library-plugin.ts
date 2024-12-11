@@ -1,6 +1,7 @@
 import { Plugin, type ToolbarItemType } from '../plugin'
 import { LibraryToolbarItem } from './library-toolbar-item'
-import type { Book } from './types'
+import type { Book } from './book'
+import type { InformationItem } from '@/toolbar'
 
 export class LibraryPlugin extends Plugin {
   protected getToolbarItems() {
@@ -18,21 +19,57 @@ export class LibraryPlugin extends Plugin {
 
   set books(books) {
     this._books = books
+    this.dispatch('books', { books })
   }
 
   get book() {
     return this._book
   }
 
-  open(book: Book) {
-    if (this.book?.id === book.id) {
+  set book(book) {
+    if (this.book?.id === book?.id) {
       return
     }
 
     this._book = book
+    this.dispatch('book', { book })
+  }
 
-    this.dispatch('interactionload', { interactions: book.interactions })
+  protected init() {
+    this.on('documentopen', ({ documentType }) => {
+      if (documentType !== this.book?.src) {
+        this.book = undefined
+      }
+    })
 
-    return this.viewer.openDocument(book.src)
+    this.on('documenttitleupdated', () => {
+      if (this.book) {
+        document.title = this.book.name
+      }
+    })
+
+    this.on('book', ({ book }) => {
+      if (book) {
+        this.viewer.openDocument(book.src)
+      }
+
+      this.setBookInformation(book)
+    })
+  }
+
+  protected setBookInformation(book?: Book) {
+    const informations = new Map<string, InformationItem>([])
+
+    if (book) {
+      ['name', 'pages', 'sku', 'author', 'description'].forEach((key, index) => {
+        informations.set(key, {
+          name: this.l10n.get(`library.book.${key}`),
+          value: book[key],
+          order: index + 1,
+        })
+      })
+    }
+
+    this.dispatch('informationupdate', ({ informations }))
   }
 }

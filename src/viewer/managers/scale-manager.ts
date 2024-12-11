@@ -135,9 +135,8 @@ export class ScaleManager extends Manager {
 
       if (Array.isArray(options?.origin)) {
         const scaleDiff = newScale / previousScale - 1
-        const [top, left] = this.containerManager.containerTopLeft
-        this.container.scrollLeft += (options.origin[0] - left) * scaleDiff
-        this.container.scrollTop += (options.origin[1] - top) * scaleDiff
+        this.viewerContainer.scrollLeft += options.origin[0] * scaleDiff
+        this.viewerContainer.scrollTop += options.origin[1] * scaleDiff
       }
     }
 
@@ -185,8 +184,8 @@ export class ScaleManager extends Manager {
       [hPadding, vPadding] = [vPadding, hPadding]
     }
 
-    const pageWidthScale = (((this.container.clientWidth - hPadding) / currentPage.width) * currentPage.scale) / this.pageWidthScaleFactor
-    const pageHeightScale = ((this.container.clientHeight - vPadding) / currentPage.height) * currentPage.scale
+    const pageWidthScale = (((this.viewerContainer.clientWidth - hPadding) / currentPage.width) * currentPage.scale) / this.pageWidthScaleFactor
+    const pageHeightScale = ((this.viewerContainer.clientHeight - vPadding) / currentPage.height) * currentPage.scale
 
     switch (value) {
       case 'page-actual':
