@@ -78,7 +78,51 @@ import { Pdfon } from '.'
         resources: [
           {
             name: 'Teste1',
-            src: 'a',
+            src: 'a.ppt',
+          },
+          {
+            name: 'Teste2',
+            items: [
+              {
+                name: 'Teste2.1',
+                src: 'b.rar',
+              },
+              {
+                name: 'Teste2.2',
+                items: [
+                  {
+                    name: 'Teste2.3',
+                    src: 'c.doc',
+                  },
+                ],
+              },
+              {
+                name: 'Teste2.3',
+                items: [],
+              },
+            ],
+          },
+          {
+            name: 'Teste2',
+            items: [
+              {
+                name: 'Teste2.1',
+                src: 'b.ttxt',
+              },
+              {
+                name: 'Teste2.2',
+                items: [
+                  {
+                    name: 'Teste2.3',
+                    src: 'c.zip',
+                  },
+                ],
+              },
+              {
+                name: 'Teste2.3',
+                items: [],
+              },
+            ],
           },
           {
             name: 'Teste2',
@@ -93,6 +137,72 @@ import { Pdfon } from '.'
                   {
                     name: 'Teste2.3',
                     src: 'c',
+                  },
+                ],
+              },
+              {
+                name: 'Teste2.3',
+                items: [],
+              },
+            ],
+          },
+          {
+            name: 'Teste2',
+            items: [
+              {
+                name: 'Teste2.1',
+                src: 'b',
+              },
+              {
+                name: 'Teste2.2',
+                items: [
+                  {
+                    name: 'Teste2.3',
+                    src: 'c',
+                  },
+                ],
+              },
+              {
+                name: 'Teste2.3',
+                items: [],
+              },
+            ],
+          },
+          {
+            name: 'Teste2',
+            items: [
+              {
+                name: 'Teste2.1',
+                src: 'b',
+              },
+              {
+                name: 'Teste2.2',
+                items: [
+                  {
+                    name: 'Teste2.3',
+                    src: 'c',
+                  },
+                ],
+              },
+              {
+                name: 'Teste2.3',
+                items: [],
+              },
+            ],
+          },
+          {
+            name: 'Teste2',
+            items: [
+              {
+                name: 'Teste2.1',
+                src: 'b',
+              },
+              {
+                name: 'Teste2.2',
+                items: [
+                  {
+                    name: 'Teste2.3',
+                    src: 'c.ppt',
                   },
                 ],
               },
