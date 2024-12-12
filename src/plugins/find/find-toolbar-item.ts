@@ -4,7 +4,7 @@ import { FindState } from './find-controller'
 
 const MATCHES_COUNT_LIMIT = 1000
 
-export class FindToolbar extends ToolbarActionToggle {
+export class FindToolbarItem extends ToolbarActionToggle {
   protected bar?: HTMLDivElement
   protected findField?: HTMLInputElement
   protected findHighlightAll?: HTMLInputElement
@@ -71,7 +71,7 @@ export class FindToolbar extends ToolbarActionToggle {
     labelMatchDiacritics.append(this.findMatchDiacritics, createElement('span', { innerText: this.l10n.get('find.match-diacritics') }))
 
     const findFieldContainer = createElement('div', 'find-field-container')
-    findFieldContainer.append(this.findField, this.findNextButton, this.findPreviousButton)
+    findFieldContainer.append(this.findField, this.findPreviousButton, this.findNextButton)
 
     const findOptionsContainer = createElement('div', 'find-options-container')
     findOptionsContainer.append(labelHighlightAll, labelCaseSensitive, labelEntireWord, labelMatchDiacritics)

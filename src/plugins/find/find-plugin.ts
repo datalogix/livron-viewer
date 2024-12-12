@@ -2,12 +2,12 @@ import type { LayerBuilder } from '@/viewer'
 import { Plugin, type ToolbarItemType } from '../plugin'
 import { FindController } from './find-controller'
 import { FindHighlighter } from './find-highlighter'
-import { FindToolbar } from './find-toolbar'
+import { FindToolbarItem } from './find-toolbar-item'
 
 export class FindPlugin extends Plugin {
   protected getToolbarItems() {
     return new Map<string, ToolbarItemType>([
-      ['find', FindToolbar],
+      ['find', FindToolbarItem],
     ])
   }
 

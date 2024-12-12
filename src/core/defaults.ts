@@ -43,7 +43,7 @@ export const DEFAULT_TOOLBAR_ITEMS = new Map<string, toolbar.ToolbarItemType>([
   ['presentation', plugins.PresentationToolbarItem],
 
   // find
-  ['find', plugins.FindToolbar],
+  ['find', plugins.FindToolbarItem],
 
   // information
   ['information', toolbar.Information],

@@ -74,7 +74,7 @@
     .find-previous {
       &:before {
         @apply
-          i-ph:arrow-up
+          i-ph:arrow-left
         ;
       }
     }
@@ -82,7 +82,7 @@
     .find-next {
       &:before {
         @apply
-          i-ph:arrow-down
+          i-ph:arrow-right
         ;
       }
     }
