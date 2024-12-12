@@ -70,7 +70,7 @@
       "label": "Ir para a última página",
       "title": "Ir para a última página"
     },
-    "prevpage": {
+    "previouspage": {
       "label": "Anterior",
       "title": "Página anterior"
     },
@@ -152,6 +152,22 @@
     }
   },
   "find": {
+    "field": {
+      "title": "Procurar",
+      "placeholder": "Faça sua pesquisa..."
+    },
+    "previous": {
+      "title": "Procurar a ocorrência anterior da frase",
+      "label": "Anterior"
+    },
+    "next": {
+      "title": "Procurar a próxima ocorrência da frase",
+      "label": "Próxima"
+    },
+    "highlight-all": "Destacar tudo",
+    "case-sensitive": "Diferenciar maiúsculas/minúsculas",
+    "entire-word": "Palavras completas",
+    "match-diacritics": "Considerar acentuação",
     "reached": {
       "top": "Início do documento alcançado, continuando do fim",
       "bottom": "Fim do documento alcançado, continuando do início"
