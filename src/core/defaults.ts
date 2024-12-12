@@ -57,7 +57,7 @@ export const DEFAULT_TOOLBAR_ITEMS = new Map<string, toolbar.ToolbarItemType>([
   ['input-page', toolbar.InputPage],
   ['last-page', toolbar.LastPage],
   ['next-page', toolbar.NextPage],
-  ['prev-page', toolbar.PrevPage],
+  ['previous-page', toolbar.PreviousPage],
   ['paginate', toolbar.Paginate],
 
   // resource

@@ -4,6 +4,7 @@ export function scrollIntoView(
   scrollMatches?: boolean,
 ) {
   let parent = element.offsetParent as HTMLElement
+
   if (!parent) {
     return
   }

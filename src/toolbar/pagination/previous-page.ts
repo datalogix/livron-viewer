@@ -1,6 +1,6 @@
 import { ToolbarAction } from '@/toolbar'
 
-export class PrevPage extends ToolbarAction {
+export class PreviousPage extends ToolbarAction {
   get enabled() {
     return this.viewer.hasPreviousPage()
   }
