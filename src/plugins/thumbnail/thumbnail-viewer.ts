@@ -90,7 +90,6 @@ export class ThumbnailViewer extends Dispatcher implements Renderable {
 
       if (shouldScroll) {
         scrollIntoView(
-          this.container,
           thumbnail.div,
           { top: THUMBNAIL_SCROLL_MARGIN },
         )

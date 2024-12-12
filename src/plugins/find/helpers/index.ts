@@ -1,3 +1,3 @@
 export * from './dictionary'
 export * from './normalize'
-export * from './string'
+export * from './search'

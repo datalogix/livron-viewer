@@ -124,6 +124,10 @@
         }
       }
 
+      &.interaction-image .interaction-icon:before {
+        @apply i-ph:image;
+      }
+
       &.interaction-audio .interaction-icon:before {
         @apply i-ph:speaker-high;
       }

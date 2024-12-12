@@ -149,7 +149,7 @@ export class ScrollManager extends Manager {
       }
     }
 
-    scrollIntoView(this.viewerContainer, page.div, pageSpot)
+    scrollIntoView(page.div, pageSpot)
 
     if (!this.currentScaleValue && this.location) {
       this.locationManager.reset()

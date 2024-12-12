@@ -10,11 +10,11 @@
     ;
   }
 
+  &:has(img),
   &:has(video) {
     @apply
       max-w-72!
       md:max-w-lg!
-      lg:max-w-xl!
     ;
   }
 
@@ -43,7 +43,8 @@
     ;
   }
 
-   video {
+  img,
+  video {
     @apply
       rounded
       w-full

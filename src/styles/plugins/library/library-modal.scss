@@ -42,8 +42,8 @@
 
       > img {
         @apply
-          w-32
-          h-40
+          max-w-32
+          max-h-40
           shrink-0
         ;
       }
@@ -66,15 +66,14 @@
         }
 
         ul {
+          @apply space-y-2;
+
           li {
-            @apply
-              text-sm
-              mb-1
-            ;
+            @apply text-sm;
 
             b {
               @apply
-                font-medium
+                font-semibol
               ;
             }
           }

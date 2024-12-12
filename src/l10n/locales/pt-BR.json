@@ -193,6 +193,7 @@
     "book": {
       "name": "Nome do livro",
       "sku": "SKU",
+      "isbn": "ISBN",
       "pages": "Número de páginas",
       "author": "Autor",
       "description": "Descrição",

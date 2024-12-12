@@ -1,36 +1,31 @@
 export function scrollIntoView(
-  scrollEl: HTMLElement,
   element: HTMLElement,
   spot?: { top?: number, left?: number },
   scrollMatches?: boolean,
 ) {
-  let offsetY = element.offsetTop - scrollEl.offsetTop
-  let offsetX = element.offsetLeft - scrollEl.offsetLeft
-
-  /*
-  let parent = element.parentElement as HTMLElement
-
+  let parent = element.offsetParent as HTMLElement
   if (!parent) {
-    console.error('offsetParent is not set -- cannot scroll')
     return
   }
 
-  let offsetY = element.offsetTop + element.clientTop
-  let offsetX = element.offsetLeft + element.clientLeft
+  let offsetY = element.offsetTop
+  let offsetX = element.offsetLeft
 
-  const isSameHeightAndWidth = parent.clientHeight === parent.scrollHeight && parent.clientWidth === parent.scrollWidth
-  const isMarkedOrHidden = parent.classList.contains('markedContent') || getComputedStyle(parent).overflow === 'hidden'
-
-  while ((isSameHeightAndWidth || scrollMatches) && isMarkedOrHidden) {
+  while (
+    (parent.clientHeight === parent.scrollHeight
+      && parent.clientWidth === parent.scrollWidth)
+    || (scrollMatches
+      && (parent.classList.contains('markedContent')
+        || getComputedStyle(parent).overflow === 'hidden'))
+  ) {
     offsetY += parent.offsetTop
     offsetX += parent.offsetLeft
-    parent = parent.parentElement as HTMLElement
+    parent = parent.offsetParent as HTMLElement
 
     if (!parent) {
       return
     }
   }
-  */
 
   if (spot) {
     if (spot.top !== undefined) {
@@ -38,11 +33,11 @@ export function scrollIntoView(
     }
     if (spot.left !== undefined) {
       offsetX += spot.left
-      scrollEl.scrollLeft = offsetX
+      parent.scrollLeft = offsetX
     }
   }
 
-  scrollEl.scrollTop = offsetY
+  parent.scrollTop = offsetY
 }
 
 type ScrollState = {

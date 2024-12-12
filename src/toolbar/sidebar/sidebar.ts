@@ -101,9 +101,12 @@ export class Sidebar extends ToolbarActionToggle {
       this.items.get(this.current)?.hide()
     }
 
-    this.items.get(key)!.show()
     this.current = key
     this.dispatch('sidebarselected', { key })
+
+    if (this.opened) {
+      this.items.get(key)!.show()
+    }
   }
 
   open() {

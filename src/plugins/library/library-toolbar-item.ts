@@ -55,6 +55,7 @@ export class LibraryToolbarItem extends ToolbarActionToggle {
 
     if (book.pages) ul.append(createElement('li', { innerHTML: `${this.l10n.get('library.book.pages')}: <b>${book.pages}</b>` }))
     if (book.sku) ul.append(createElement('li', { innerHTML: `${this.l10n.get('library.book.sku')}: <b>${book.sku}</b>` }))
+    if (book.isbn) ul.append(createElement('li', { innerHTML: `${this.l10n.get('library.book.isbn')}: <b>${book.isbn}</b>` }))
     if (book.interactions) ul.append(createElement('li', { innerHTML: `${this.l10n.get('library.book.interactions')}: <b>${book.interactions.length}</b>` }))
     if (book.author) ul.append(createElement('li', { innerHTML: `${this.l10n.get('library.book.author')}: <b>${book.author}</b>` }))
     if (book.description) ul.append(createElement('li', 'description', { innerHTML: book.description }))

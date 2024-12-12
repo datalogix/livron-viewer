@@ -40,6 +40,12 @@
       ;
     }
 
+    &.interaction-image {
+      &:before {
+        @apply i-ph:image;
+      }
+    }
+
     &.interaction-audio {
       &:before {
         @apply i-ph:speaker-high;

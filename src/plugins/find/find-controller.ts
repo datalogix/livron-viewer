@@ -289,7 +289,7 @@ export class FindController extends Dispatcher {
     scrollIntoView(element, {
       top: MATCH_SCROLL_OFFSET_TOP,
       left: selectedLeft + MATCH_SCROLL_OFFSET_LEFT,
-    }, /* scrollMatches = */ true)
+    }, true)
   }
 
   protected get query() {

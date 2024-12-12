@@ -1,5 +1,5 @@
 import type { PrintAnnotationStorage } from '@/pdfjs'
-import { createElement, dispatchEvent } from '@/utils'
+import { dispatchEvent } from '@/utils'
 import { Modal, ProgressBar } from '@/tools'
 import type { ScriptingPlugin } from '../scripting'
 import { Plugin, type ToolbarItemType } from '../plugin'
